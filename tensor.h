@@ -206,7 +206,13 @@ namespace ts
                     o << ", ";
                 }
             }
-            o << "]" << std::endl;
+            o << "]";
+            if (layer > 0)
+            {
+                o << ",";
+            }
+            o << std::endl;
+            
         }
         else{
             o << std::endl;
@@ -214,7 +220,18 @@ namespace ts
             {
                 recurse_print(shape, stride, layer+1, data+stride[layer]*i, ndim);
             }
-            o << "]" << std::endl;
+            for (int i = 0; i < layer; i++)
+            {
+                o << " ";
+            }
+            
+            o << "]";
+            if (layer > 0 )
+            {
+                o << ",";
+            }
+            o << std::endl;
+            
         }        
     }
 
