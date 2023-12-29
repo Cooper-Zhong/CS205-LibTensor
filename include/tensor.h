@@ -3,6 +3,7 @@
 #include <string>    // std::string
 #include <memory>
 #include <stdexcept>
+#include <iostream>
 
 
 #ifndef TENSOR_H_
