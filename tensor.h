@@ -47,6 +47,9 @@ namespace ts
         const std::vector<int> &get_shape() const;
 
         const std::vector<int> &get_stride() const;
+
+        template <typename T1>
+        friend std::ostream & operator<<(std::ostream & o, Tensor<T1> &t);
     };
 
     // Default Constructor
@@ -77,6 +80,13 @@ namespace ts
         }
 
         data = std::shared_ptr<T[]>(new T[data_length]);
+        for (int i = 0; i < data_length; i++)
+        {
+            data[i] = 0;
+        }
+
+        
+        
     }
 
     // Constructor with existing data and shape
@@ -158,6 +168,79 @@ namespace ts
     {
         return stride;
     }
+
+    template <typename T>
+    void recurse_print(const std::vector<int>& shape,const std::vector<int>& stride, int layer,const T* data, int ndim){
+        std::ostream& o = std::cout;
+        for (int i = 0; i < layer; i++)
+        {
+            o << " ";
+        }
+        
+        o << "[";
+        if (layer+1 == ndim)
+        {
+            for (int i = 0; i < shape[layer]; i++)
+            {
+                o << data[i*stride[layer]];
+                if (i+1<shape[layer])
+                {
+                    o << ", ";
+                }
+            }
+            o << "]" << std::endl;
+        }
+        else{
+            o << std::endl;
+            for (int i = 0; i < shape[layer]; i++)
+            {
+                recurse_print(shape, stride, layer+1, data+stride[layer]*i, ndim);
+            }
+            o << "]";
+        }        
+    }
+
+    template <typename T>
+    std::ostream & operator<<(std::ostream & o, Tensor<T> & t)
+    {
+        o << "Data pointer: " << t.get_data() << std::endl;
+        o << "Data length: " << t.get_data_length() << std::endl;
+        o << "Type: " << t.get_type() << std::endl;
+        o << "Offset: " << t.get_offset() << std::endl;
+        o << "Ndim:" << t.get_ndim() << std::endl;
+        auto t_shape = t.get_shape();
+        o << "Shape: [";
+        for (int i = 0; i < t_shape.size(); i++)
+        {
+            o << t_shape[i];
+            if (i+1 < t_shape.size())
+            {
+                o << ", ";
+            }
+        }
+        o << "]" << std::endl;
+
+
+        auto t_stride = t.get_stride();
+        o << "Stride: [";
+        for (int i = 0; i < t_stride.size(); i++)
+        {
+            o << t_stride[i];
+            if (i+1 < t_stride.size())
+            {
+                o << ", ";
+            }
+        }
+        o << "]" << std::endl;
+        
+        T* t_data = t.get_data().get()+t.get_offset();
+
+        recurse_print(t_shape, t_stride, 0, t_data, t.get_ndim());
+        
+        return o;
+    }
+
+
 
 
 
