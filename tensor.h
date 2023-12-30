@@ -3,6 +3,7 @@
 #include <string>    // std::string
 #include <memory>
 #include <stdexcept>
+#include <random>
 
 
 #ifndef TENSOR_H_
@@ -32,6 +33,16 @@ namespace ts
         Tensor(const std::vector<int> &_shape);
 
         Tensor(const T* data, const std::vector<int> &_shape);
+
+        static Tensor<T> rand_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> zeros_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> ones_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> full_tensor(const std::vector<int> &_shape, T t);
+
+        static Tensor<T> eye_tensor(const std::vector<int> &_shape);
 
         // Destructor
         ~Tensor();
@@ -129,6 +140,90 @@ namespace ts
         // Allocate memory for data and copy the content
         data = std::shared_ptr<T[]>(new T[data_length]);
         std::copy(_data, _data + data_length, data.get());
+    }
+
+    // rand_tensor method implementation
+    template <typename T>
+    Tensor<T> Tensor<T>::rand_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> random_tensor(_shape);
+
+        // Generate random numbers for real number types
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        // std::uniform_real_distribution<T> dis(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        std::uniform_real_distribution<T> dis(-10, 10);
+        for (int i = 0; i < random_tensor.data_length; i++)
+        {
+            random_tensor.data[i] = dis(gen);
+        }
+
+        return random_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::zeros_tensor(const std::vector<int> &_shape)
+    {
+        return Tensor<T>(_shape);
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::ones_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> ones_tensor(_shape);
+
+        // Initialize all elements to one
+        for (int i = 0; i < ones_tensor.data_length; i++)
+        {
+            ones_tensor.data[i] = 1;
+        }
+
+        return ones_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::full_tensor(const std::vector<int> &_shape, T t)
+    {
+        Tensor<T> full_tensor(_shape);
+
+        // Initialize all elements to the specified value 't'
+        for (int i = 0; i < full_tensor.data_length; i++)
+        {
+            full_tensor.data[i] = t;
+        }
+
+        return full_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::eye_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> eye_tensor(_shape);
+
+        // Check if the shape is square
+        if (_shape.size() < 2 || !std::equal(_shape.begin(), _shape.end()-1, _shape.begin() + 1, std::equal_to<int>()))
+        {
+            throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+        }
+
+        // Initialize as an identity matrix
+        T * data=eye_tensor.get_data().get();
+        T * current = data;
+        auto stride = eye_tensor.get_stride();
+
+        for (int i = 0; i < _shape[0]; i++)
+        {
+            current = data;
+            for (int j = 0; j < _shape.size(); j++)
+            {
+                current += i*stride[j];
+            }
+            *current = 1;
+        }
+        
+
+        return eye_tensor;
     }
 
     // Destructor
