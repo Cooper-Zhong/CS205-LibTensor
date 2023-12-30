@@ -1,6 +1,6 @@
 #include <vector>
-#include <typeinfo>  // typeid
-#include <string>    // std::string
+#include <typeinfo> // typeid
+#include <string>   // std::string
 #include <memory>
 #include <stdexcept>
 #include <stack>
@@ -19,15 +19,12 @@ namespace ts
     class Tensor
     {
     private:
-        
         std::shared_ptr<T[]> data;
         int offset;
         int ndim;
         int data_length;
         std::vector<int> shape;
         std::vector<int> stride;
-        
-        
 
     public:
         // Constructor
@@ -35,7 +32,7 @@ namespace ts
 
         Tensor(const std::vector<int> &_shape);
 
-        Tensor(const T* data, const std::vector<int> &_shape);
+        Tensor(const T *data, const std::vector<int> &_shape);
 
         static Tensor<T> rand_tensor(const std::vector<int> &_shape);
 
@@ -49,7 +46,7 @@ namespace ts
 
         // Destructor
         ~Tensor();
-        
+
         std::string get_type() const;
 
         std::shared_ptr<T[]> get_data();
@@ -77,9 +74,9 @@ namespace ts
 
         Tensor<T> permute(const std::vector<int> &axes);
 
-        Tensor<T> transpose(const int& dim1, const int & dim2);
+        Tensor<T> transpose(const int &dim1, const int &dim2);
 
-        Tensor<T> cat(const Tensor<T> &other, const int & dim);
+        Tensor<T> cat(const Tensor<T> &other, const int &dim);
 
         bool is_contiguous() const;
 
@@ -89,23 +86,51 @@ namespace ts
 
         Tensor<T> squeeze();
 
+        Tensor<T> unsqueeze(int new_dim);
+
+        Tensor<T> tile(std::vector<int> dims);
+
         void view(const std::vector<int> &shape);
 
         template <typename T1>
-        friend std::ostream & operator<<(std::ostream & o, Tensor<T1> &t);
+        friend std::ostream &operator<<(std::ostream &o, Tensor<T1> &t);
 
         /**
          * @brief 重载运算符
          */
-        Tensor<T>& operator=(const Tensor<T> &t); //copy
+        Tensor<T> &operator=(const Tensor<T> &t);    // copy
         Tensor<bool> operator==(const Tensor<T> &t); // 等于
         Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
         Tensor<bool> operator>(const Tensor<T> &t);  // 大于
         Tensor<bool> operator<(const Tensor<T> &t);  // 小于
         Tensor<bool> operator>=(const Tensor<T> &t); // 大于等于
         Tensor<bool> operator<=(const Tensor<T> &t); // 小于等于
+        Tensor<bool> eq(const Tensor<T> &t);         // 等于
+        Tensor<bool> ne(const Tensor<T> &t);         // 不等于
+        Tensor<bool> gt(const Tensor<T> &t);         // 大于
+        Tensor<bool> lt(const Tensor<T> &t);         // 小于
+        Tensor<bool> ge(const Tensor<T> &t);         // 大于等于
+        Tensor<bool> le(const Tensor<T> &t);         // 小于等于
+
+        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
+
+        
+
+        /**
+         * @brief reduction operation: sum, mean, max, min
+         */
+
+        Tensor<T> sum(const int &dim) const;
+
+        Tensor<T> mean(const int &dim) const;
+
+        Tensor<T> max(const int &dim) const;
+
+        Tensor<T> min(const int &dim) const;
+
         template <typename U>
-        friend Tensor<bool> eq(const Tensor<T> &t1, const Tensor<T> &t2); // 等于
+        friend Tensor<U> sum(const Tensor<U> &t, const int &dim);
+
         template <typename U>
         friend Tensor<bool> ne(const Tensor<T> &t1, const Tensor<T> &t2); // 不等于
         template <typename U>
@@ -113,11 +138,16 @@ namespace ts
         template <typename U>
         friend Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2); // 小于
         template <typename U>
-        friend Tensor<bool> ge(const Tensor<T> &t1, const Tensor<T> &t2); // 大于等于
-        template <typename U>
-        friend Tensor<bool> le(const Tensor<T> &t1, const Tensor<T> &t2); // 小于等于
+        friend Tensor<U> sum(const Tensor<U> &t, const int &dim);
 
-        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
+        template <typename U>
+        friend Tensor<U> mean(const Tensor<U> &t, const int &dim);
+
+        template <typename U>
+        friend Tensor<U> max(const Tensor<U> &t, const int &dim);
+
+        template <typename U>
+        friend Tensor<U> min(const Tensor<U> &t, const int &dim);
 
         static Tensor<T> re_construct(const Tensor<T> & t);
 
@@ -167,6 +197,7 @@ namespace ts
 
         
 
+        
     };
 
     // Default Constructor
@@ -179,7 +210,8 @@ namespace ts
 
     // Constructor with shape
     template <typename T>
-    Tensor<T>::Tensor(const std::vector<int> &_shape) : offset(0), ndim(_shape.size()), shape(_shape), stride(std::vector<int>())
+    Tensor<T>::Tensor(const std::vector<int> &_shape) : offset(0), ndim(_shape.size()), shape(_shape),
+                                                        stride(std::vector<int>())
     {
         // Calculate data_length and allocate memory for data
         data_length = 1;
@@ -192,7 +224,7 @@ namespace ts
 
         for (int i = 0; i < ndim; i++)
         {
-            data_l/=shape[i];
+            data_l /= shape[i];
             stride.push_back(data_l);
         }
 
@@ -201,14 +233,12 @@ namespace ts
         {
             data[i] = 0;
         }
-
-        
-        
     }
 
     // Constructor with existing data and shape
     template <typename T>
-    Tensor<T>::Tensor(const T* _data, const std::vector<int> &_shape) : offset(0), ndim(_shape.size()), shape(_shape), stride(std::vector<int>())
+    Tensor<T>::Tensor(const T *_data, const std::vector<int> &_shape) : offset(0), ndim(_shape.size()), shape(_shape),
+                                                                        stride(std::vector<int>())
     {
         // Calculate data_length and allocate memory for data
         data_length = 1;
@@ -221,7 +251,7 @@ namespace ts
 
         for (int i = 0; i < ndim; i++)
         {
-            data_l/=shape[i];
+            data_l /= shape[i];
             stride.push_back(data_l);
         }
 
@@ -290,14 +320,15 @@ namespace ts
         Tensor<T> eye_tensor(_shape);
 
         // Check if the shape is square
-        if (_shape.size() < 2 || !std::equal(_shape.begin(), _shape.end()-1, _shape.begin() + 1, std::equal_to<int>()))
+        if (_shape.size() < 2 ||
+            !std::equal(_shape.begin(), _shape.end() - 1, _shape.begin() + 1, std::equal_to<int>()))
         {
             throw std::invalid_argument("eye_tensor is only supported for square tensors.");
         }
 
         // Initialize as an identity matrix
-        T * data=eye_tensor.get_data().get();
-        T * current = data;
+        T *data = eye_tensor.get_data().get();
+        T *current = data;
         auto stride = eye_tensor.get_stride();
 
         for (int i = 0; i < _shape[0]; i++)
@@ -305,11 +336,10 @@ namespace ts
             current = data;
             for (int j = 0; j < _shape.size(); j++)
             {
-                current += i*stride[j];
+                current += i * stride[j];
             }
             *current = 1;
         }
-        
 
         return eye_tensor;
     }
@@ -359,33 +389,35 @@ namespace ts
 
     // Get the shape
     template <typename T>
-    const std::vector<int>& Tensor<T>::get_shape() const
+    const std::vector<int> &Tensor<T>::get_shape() const
     {
         return shape;
     }
 
     // Get the stride
     template <typename T>
-    const std::vector<int>& Tensor<T>::get_stride() const
+    const std::vector<int> &Tensor<T>::get_stride() const
     {
         return stride;
     }
 
     template <typename T>
-    void recurse_print(const std::vector<int>& shape,const std::vector<int>& stride, int layer,const T* data, int ndim){
-        std::ostream& o = std::cout;
+    void
+    recurse_print(const std::vector<int> &shape, const std::vector<int> &stride, int layer, const T *data, int ndim)
+    {
+        std::ostream &o = std::cout;
         for (int i = 0; i < layer; i++)
         {
             o << " ";
         }
-        
+
         o << "[";
-        if (layer+1 == ndim)
+        if (layer + 1 == ndim)
         {
             for (int i = 0; i < shape[layer]; i++)
             {
-                o << data[i*stride[layer]];
-                if (i+1<shape[layer])
+                o << data[i * stride[layer]];
+                if (i + 1 < shape[layer])
                 {
                     o << ", ";
                 }
@@ -396,31 +428,30 @@ namespace ts
                 o << ",";
             }
             o << std::endl;
-            
         }
-        else{
+        else
+        {
             o << std::endl;
             for (int i = 0; i < shape[layer]; i++)
             {
-                recurse_print(shape, stride, layer+1, data+stride[layer]*i, ndim);
+                recurse_print(shape, stride, layer + 1, data + stride[layer] * i, ndim);
             }
             for (int i = 0; i < layer; i++)
             {
                 o << " ";
             }
-            
+
             o << "]";
-            if (layer > 0 )
+            if (layer > 0)
             {
                 o << ",";
             }
             o << std::endl;
-            
-        }        
+        }
     }
 
     template <typename T>
-    std::ostream & operator<<(std::ostream & o, Tensor<T> & t)
+    std::ostream &operator<<(std::ostream &o, Tensor<T> &t)
     {
         // o << "Data pointer: " << t.get_data() << std::endl;
         // o << "Data length: " << t.get_data_length() << std::endl;
@@ -432,59 +463,60 @@ namespace ts
         for (int i = 0; i < t_shape.size(); i++)
         {
             o << t_shape[i];
-            if (i+1 < t_shape.size())
+            if (i + 1 < t_shape.size())
             {
                 o << ", ";
             }
         }
-        o << "]" << " ";
-
+        o << "]"
+          << " ";
 
         auto t_stride = t.get_stride();
         o << "Stride: [";
         for (int i = 0; i < t_stride.size(); i++)
         {
             o << t_stride[i];
-            if (i+1 < t_stride.size())
+            if (i + 1 < t_stride.size())
             {
                 o << ", ";
             }
         }
         o << "]" << std::endl;
-        
-        T* t_data = t.get_data().get()+t.get_offset();
+
+        T *t_data = t.get_data().get() + t.get_offset();
 
         recurse_print(t_shape, t_stride, 0, t_data, t.get_ndim());
-        
+
         return o;
     }
 
     template <typename T>
-    Tensor<T>& Tensor<T>::operator=(const Tensor<T> &t){
-        
-        if (this->shape.size()!=t.shape.size()||!std::equal(this->shape.begin(),this->shape.end(),t.shape.begin(), std::equal_to<int>()))
+    Tensor<T> &Tensor<T>::operator=(const Tensor<T> &t)
+    {
+
+        if (this->shape.size() != t.shape.size() ||
+            !std::equal(this->shape.begin(), this->shape.end(), t.shape.begin(), std::equal_to<int>()))
         {
             throw std::invalid_argument("copy is only supported for tensors of the same shape.");
         }
         else
         {
-            std::vector<int> index=std::vector<int>(this->ndim,0);
-            int top=this->ndim-1;
-            T* data_this = this->data.get()+this->offset;
-            T* data_copy = t.data.get()+t.offset;
-            T* current_this = data_this;
-            T* current_copy = data_copy;
+            std::vector<int> index = std::vector<int>(this->ndim, 0);
+            int top = this->ndim - 1;
+            T *data_this = this->data.get() + this->offset;
+            T *data_copy = t.data.get() + t.offset;
+            T *current_this = data_this;
+            T *current_copy = data_copy;
 
-            
-            while (index[0]<this->shape[0])
+            while (index[0] < this->shape[0])
             {
 
                 current_this = data_this;
                 current_copy = data_copy;
                 for (int i = 0; i < this->ndim; i++)
                 {
-                    current_this += index[i]*this->stride[i];
-                    current_copy += index[i]*t.stride[i];
+                    current_this += index[i] * this->stride[i];
+                    current_copy += index[i] * t.stride[i];
                 }
 
                 *current_this = *current_copy;
@@ -492,7 +524,7 @@ namespace ts
                 while (index[top] == this->shape[top])
                 {
                     top--;
-                    if (top<0)
+                    if (top < 0)
                     {
                         break;
                     }
@@ -502,29 +534,20 @@ namespace ts
                 {
                     break;
                 }
-                while (top < this->ndim-1)
+                while (top < this->ndim - 1)
                 {
                     top++;
-                    index[top]=0;
+                    index[top] = 0;
                 }
-                
             }
-            
         }
-
-        
-        
-
 
         return *this;
     }
 
-
-
-
-
     template <typename T>
-    Tensor<T> Tensor<T>::slicing(const std::vector<std::vector<int>> & indices){
+    Tensor<T> Tensor<T>::slicing(const std::vector<std::vector<int>> &indices)
+    {
         // Check if the number of indices is equal to the number of dimensions
         if (indices.size() != ndim)
         {
@@ -538,9 +561,9 @@ namespace ts
             {
                 throw std::invalid_argument("The number of indices for each dimension must be equal to 2.");
             }
-            if (indices[i][0] < 0 || indices[i][0] >= shape[i] || indices[i][1] < 0 || indices[i][1] > shape[i])
+            if (indices[i][0] < 0 || indices[i][0] > shape[i] || indices[i][1] < 0 || indices[i][1] > shape[i])
             {
-                throw std::invalid_argument("The indices are out of range.");
+                throw std::invalid_argument("Slicing: The indices are out of range.");
             }
         }
 
@@ -571,12 +594,14 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::operator()(const std::vector<std::vector<int>> & indices){
+    Tensor<T> Tensor<T>::operator()(const std::vector<std::vector<int>> &indices)
+    {
         return slicing(indices);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::indexing(const std::vector<int> & indices){
+    Tensor<T> Tensor<T>::indexing(const std::vector<int> &indices)
+    {
         // Check if the number of indices is equal to the number of dimensions
         if (indices.size() != ndim)
         {
@@ -629,13 +654,14 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::operator()(const std::vector<int> & indices){
+    Tensor<T> Tensor<T>::operator()(const std::vector<int> &indices)
+    {
         return indexing(indices);
     }
 
-
     template <typename T>
-    Tensor<T> Tensor<T>::permute(const std::vector<int> & axes){
+    Tensor<T> Tensor<T>::permute(const std::vector<int> &axes)
+    {
         // Check if the number of axes is equal to the number of dimensions
         if (axes.size() != ndim)
         {
@@ -684,7 +710,8 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::transpose(const int& dim1, const int & dim2){
+    Tensor<T> Tensor<T>::transpose(const int &dim1, const int &dim2)
+    {
         // Check if the number of axes is equal to the number of dimensions
         if (dim1 < 0 || dim1 >= ndim || dim2 < 0 || dim2 >= ndim)
         {
@@ -712,7 +739,8 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int & dim){
+    Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int &dim)
+    {
         // Check if the number of dimensions is equal
         if (ndim != other.ndim)
         {
@@ -741,9 +769,31 @@ namespace ts
         new_shape[dim] += other_shape[dim];
 
         Tensor<T> new_tensor(new_shape);
+        std::vector<std::vector<int>> slicing_indices_current;
+        std::vector<std::vector<int>> slicing_indices_other;
+        for (int i = 0; i < ndim; i++)
+        {
+            if (i != dim)
+            {
+                slicing_indices_current.push_back({0, shape[i]});
+                slicing_indices_other.push_back({0, other.shape[i]});
+            }
+            else
+            {
+                slicing_indices_current.push_back({0, shape[i]});
+                slicing_indices_other.push_back({shape[i], shape[i] + other.shape[i]});
+            }
+        }
+
+        new_tensor(slicing_indices_current) = *this;
+        new_tensor(slicing_indices_other) = other;
+
+        return new_tensor;
     }
+
     template <typename T>
-    bool Tensor<T>::is_contiguous() const{
+    bool Tensor<T>::is_contiguous() const
+    {
         size_t true_data_length = 1;
         for (int axis : shape)
         {
@@ -756,7 +806,8 @@ namespace ts
         }
 
         int stride = 1;
-        for(int i = ndim-1; i >= 0; i--){
+        for (int i = ndim - 1; i >= 0; i--)
+        {
             if (stride != this->stride[i])
             {
                 return false;
@@ -767,12 +818,13 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::contiguous() const{
+    Tensor<T> Tensor<T>::contiguous() const
+    {
         // Check contiguous of the tensor
-        if(is_contiguous()){
+        if (is_contiguous())
+        {
             return *this;
         }
-
 
         // Create a new tensor
         Tensor<T> new_tensor = Tensor<T>(shape);
@@ -780,15 +832,17 @@ namespace ts
         // Copy data element by element
         new_tensor = *this;
 
- 
+        new_tensor = *this;
+
         return new_tensor;
     }
-    
 
     template <typename T>
-    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape){
+    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape)
+    {
         // check contiguous of the tensor
-        if(!is_contiguous()){
+        if (!is_contiguous())
+        {
             throw std::invalid_argument("The tensor is not contiguous.");
         }
 
@@ -816,7 +870,7 @@ namespace ts
         int data_l = data_length;
         for (int i = 0; i < ndim; i++)
         {
-            data_l/=shape[i];
+            data_l /= shape[i];
             new_stride.push_back(data_l);
         }
         new_tensor.stride = new_stride;
@@ -825,7 +879,8 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::squeeze(){
+    Tensor<T> Tensor<T>::squeeze()
+    {
         // Check if the tensor is a vector
         if (ndim == 1)
         {
@@ -855,7 +910,7 @@ namespace ts
         int data_l = data_length;
         for (int i = 0; i < ndim; i++)
         {
-            data_l/=shape[i];
+            data_l /= shape[i];
             new_stride.push_back(data_l);
         }
         new_tensor.stride = new_stride;
@@ -863,27 +918,200 @@ namespace ts
         return new_tensor;
     }
 
-    template<typename T>
-    void Tensor<T>::view(const std::vector<int> &shape){
+    template <typename T>
+    Tensor<T> Tensor<T>::unsqueeze(int new_dim)
+    {
+        // Check if the dimension is valid
+        if (new_dim < 0 || new_dim < ndim)
+        {
+            throw std::invalid_argument("The dimension is out of range.");
+        }
+
+        if (new_dim == ndim)
+        {
+            return *this;
+        }
+
+        // Calculate the new shape
+        std::vector<int> new_shape;
+        int dim_diff = new_dim - ndim;
+        for (int i = 0; i < new_dim; i++)
+        {
+            if (i < ndim)
+            {
+                new_shape.push_back(1);
+            }
+            else
+            {
+                new_shape.push_back(shape[i - dim_diff]);
+            }
+        }
+
+        // Calculate the new stride
+        std::vector<int> new_stride;
+        for (int i = new_dim - 1; i >= 0; i--)
+        {
+            if (i - dim_diff >= 0)
+            {
+                new_stride.push_back(stride[i - dim_diff]);
+            }
+            else
+            {
+                new_stride.push_back(new_stride[i + 1] * new_shape[i + 1]);
+            }
+        }
+
+        // Create a new tensor
+        Tensor<T> new_tensor;
+        new_tensor.data = data;
+        new_tensor.offset = offset;
+        new_tensor.ndim = new_shape.size();
+        new_tensor.data_length = data_length;
+        new_tensor.shape = new_shape;
+        new_tensor.stride = new_stride;
+        return new_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::tile(std::vector<int> dims)
+    {
+        // Check if the dimensions are valid
+        for (int i = 0; i < ndim; i++)
+        {
+            if (dims[i] < 1)
+            {
+                throw std::invalid_argument("The dimensions must be greater than 0.");
+            }
+        }
+Tensor<T> tensor = *this;
+        // Check if the number of dimensions is equal
+        if (dims.size() < ndim)
+        {
+            dims.insert(dims.begin(), ndim - dims.size(), 1);
+}else if(dims.size() > ndim){
+            tensor = this->unsqueeze(dims.size());
+        }
+        
+        // Calculate the new shape
+        std::vector<int> new_shape;
+        for (int i = 0; i < ndim; i++)
+        {
+            new_shape.push_back(shape[i] * dims[i]);
+        }
+
+        Tensor<T> new_tensor = Tensor<T>(new_shape);
+
+        // fill in new data
+        std::vector<int> index = std::vector<int>(dims.size(),0);
+        int top = dims.size() - 1;
+        while (true)
+        {
+            // copy at here
+            std::vector<std::vector<int>> slicing_indices;
+
+            for (int i = 0; i < dims.size(); i++)
+            {
+                slicing_indices.push_back({index[i]*shape[i], (index[i]+1)*shape[i]});
+            }
+            new_tensor(slicing_indices) = tensor;
+
+            index[top]++;
+            while (index[top] == dims[top])
+            {
+                top--;
+                if (top<0)
+                {
+                    break;
+                }
+                index[top]++;
+            }
+            if (top < 0)
+            {
+                break;
+            }
+            while (top < dims.size() - 1)
+            {
+                top++;
+                index[top]=0;
+            }
+        }
+
+        return new_tensor;
+    }
+
+    template <typename T>
+    void Tensor<T>::view(const std::vector<int> &shape)
+    {
         Tensor<T> reshaped_tensor = reshape(shape);
-        //output
+        // output
         std::cout << reshaped_tensor << std::endl;
+    }
+
+    /**
+     * @brief 重载运算符
+     */
+
+    template <typename T>
+    void Tensor<T>::checkShape(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        if (t1.get_type() != t2.get_type())
+        {
+            throw std::runtime_error("Tensor type mismatch");
+        }
+        if (t1.ndim != t2.ndim)
+        {
+            throw std::runtime_error("Tensor dimension mismatch");
+        }
+        for (int i = 0; i < t1.ndim; i++)
+        {
+            if (t1.shape[i] != t2.shape[i])
+            {
+                throw std::runtime_error("Tensor shape mismatch");
+            }
+        }
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator==(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
+
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
+        {
+            result.get_data()[i] = (temp1.get_data()[i] == temp2.get_data()[i]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator!=(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
+
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
+        {
+            result.get_data()[i] = (temp1.get_data()[i] != temp2.get_data()[i]);
+        }
+        return result;
     }
 
     template <typename T>
     Tensor<bool> Tensor<T>::operator>(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
 
-        for (int i = 0; i < this->data_length; i++)
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
         {
-            result.data[i] = (this->data[i + this->offset] > t.data[i + t.offset]);
+            result.get_data()[i] = (temp1.get_data()[i] > temp2.get_data()[i]);
         }
         return result;
     }
@@ -892,16 +1120,13 @@ namespace ts
     Tensor<bool> Tensor<T>::operator<(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
 
-        for (int i = 0; i < this->data_length; i++)
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
         {
-            result.data[i] = (this->data[i + this->offset] < t.data[i + t.offset]);
+            result.get_data()[i] = (temp1.get_data()[i] < temp2.get_data()[i]);
         }
         return result;
     }
@@ -910,16 +1135,13 @@ namespace ts
     Tensor<bool> Tensor<T>::operator>=(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
 
-        for (int i = 0; i < this->data_length; i++)
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
         {
-            result.data[i] = (this->data[i + this->offset] >= t.data[i + t.offset]);
+            result.get_data()[i] = (temp1.get_data()[i] >= temp2.get_data()[i]);
         }
         return result;
     }
@@ -928,60 +1150,221 @@ namespace ts
     Tensor<bool> Tensor<T>::operator<=(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+        Tensor<T> temp1 = contiguous();
+        Tensor<T> temp2 = t.contiguous();
 
-        for (int i = 0; i < this->data_length; i++)
+        Tensor<bool> result = Tensor<bool>(temp1.get_shape());
+        for (int i = 0; i < temp1.get_data_length(); i++)
         {
-            result.data[i] = (this->data[i + this->offset] <= t.data[i + t.offset]);
+            result.get_data()[i] = (temp1.get_data()[i] <= temp2.get_data()[i]);
         }
         return result;
     }
 
     template <typename T>
-    Tensor<bool> eq(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::eq(const Tensor<T> &t)
     {
-        return t1 == t2;
+        return *this == t;
     }
 
     template <typename T>
-    Tensor<bool> ne(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::ne(const Tensor<T> &t)
     {
-        return t1 != t2;
+        return *this != t;
     }
 
     template <typename T>
-    Tensor<bool> gt(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::gt(const Tensor<T> &t)
     {
-        return t1 > t2;
+        return *this > t;
     }
 
     template <typename T>
-    Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::lt(const Tensor<T> &t)
     {
-        return t1 < t2;
+        return *this < t;
     }
 
     template <typename T>
-    Tensor<bool> ge(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::ge(const Tensor<T> &t)
     {
-        return t1 >= t2;
+        return *this >= t;
     }
 
     template <typename T>
-    Tensor<bool> le(const Tensor<T> &t1, const Tensor<T> &t2)
+    Tensor<bool> Tensor<T>::le(const Tensor<T> &t)
     {
-        return t1 <= t2;
+        return *this <= t;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::sum(const int &dim) const
+    {
+        if (dim < 0 || dim >= ndim)
+        {
+            throw std::invalid_argument("Dimension out of range.");
+        }
+        // 计算结果张量的形状
+        std::vector<int> result_shape(ndim - 1);
+        for (int i = 0, j = 0; i < shape.size(); ++i)
+        {
+            if (i != dim)
+            {
+                result_shape[j++] = shape[i];
+            }
+        }
+        Tensor result = Tensor<T>(result_shape);
+        for (int i = 0; i < result.data_length; ++i)
+        {
+            for (int j = 0; j < stride[dim]; ++j)
+            {
+                T sum = 0;
+                for (int k = 0; k < shape[dim]; ++k)
+                {
+                    if (dim == 0)
+                    {
+                        sum += data[k * stride[dim] + j + offset];
+                    }
+                    else
+                    {
+                        sum += data[i * stride[dim - 1] + k * stride[dim] + j + offset];
+                    }
+                }
+                result.data[i * stride[dim] + j] = sum;
+            }
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::mean(const int &dim) const
+    {
+        Tensor<T> result = sum(dim);
+        for (int i = 0; i < result.data_length; ++i)
+        {
+            result.data[i] /= shape[dim];
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::max(const int &dim) const
+    {
+        if (dim < 0 || dim >= ndim)
+        {
+            throw std::invalid_argument("Dimension out of range.");
+        }
+        // 计算结果张量的形状
+        std::vector<int> result_shape(ndim - 1);
+        for (int i = 0, j = 0; i < shape.size(); ++i)
+        {
+            if (i != dim)
+            {
+                result_shape[j++] = shape[i];
+            }
+        }
+        Tensor result = Tensor<T>(result_shape);
+        for (int i = 0; i < result.data_length; ++i)
+        {
+            for (int j = 0; j < stride[dim]; ++j)
+            {
+                T max = std::numeric_limits<T>::min();
+                for (int k = 0; k < shape[dim]; ++k)
+                {
+                    if (dim == 0)
+                    {
+                        if (data[k * stride[dim] + j + offset] > max)
+                        {
+                            max = data[k * stride[dim] + j + offset];
+                        }
+                    }
+                    else
+                    {
+                        if (data[i * stride[dim - 1] + k * stride[dim] + j + offset] > max)
+                        {
+                            max = data[i * stride[dim - 1] + k * stride[dim] + j + offset];
+                        }
+                    }
+                }
+                result.data[i * stride[dim] + j] = max;
+            }
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::min(const int &dim) const
+    {
+        if (dim < 0 || dim >= ndim)
+        {
+            throw std::invalid_argument("Dimension out of range.");
+        }
+        // 计算结果张量的形状
+        std::vector<int> result_shape(ndim - 1);
+        for (int i = 0, j = 0; i < shape.size(); ++i)
+        {
+            if (i != dim)
+            {
+                result_shape[j++] = shape[i];
+            }
+        }
+        Tensor result = Tensor<T>(result_shape);
+        for (int i = 0; i < result.data_length; ++i)
+        {
+            for (int j = 0; j < stride[dim]; ++j)
+            {
+                T min = std::numeric_limits<T>::max();
+                for (int k = 0; k < shape[dim]; ++k)
+                { // 对dim维度上的元素求和
+                    if (dim == 0)
+                    {
+                        if (data[k * stride[dim] + j + offset] < min)
+                        {
+                            min = data[k * stride[dim] + j + offset];
+                        }
+                    }
+                    else
+                    {
+                        if (data[i * stride[dim - 1] + k * stride[dim] + j + offset] < min)
+                        {
+                            min = data[i * stride[dim - 1] + k * stride[dim] + j + offset];
+                        }
+                    }
+                }
+                result.data[i * stride[dim] + j] = min;
+            }
+        }
+        return result;
+    }
+
+    template <typename U>
+    Tensor<U> sum(const Tensor<U> &t, const int &dim)
+    {
+        return t.sum(dim);
+    }
+
+    template <typename U>
+    Tensor<U> mean(const Tensor<U> &t, const int &dim)
+    {
+        return t.mean(dim);
+    }
+
+    template <typename U>
+    Tensor<U> max(const Tensor<U> &t, const int &dim)
+    {
+        return t.max(dim);
+    }
+
+    template <typename U>
+    Tensor<U> min(const Tensor<U> &t, const int &dim)
+    {
+        return t.min(dim);
     }
 
     // ==================================== Cooper
 
     template <typename T>
-    Tensor<T> re_construct(const Tensor<T> & t)
+    Tensor<T> re_construct(const Tensor<T> &t)
     {
         Tensor<T> result = Tensor<T>(t.shape);
         result = t;
