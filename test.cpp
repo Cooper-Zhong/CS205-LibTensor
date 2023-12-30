@@ -8,7 +8,7 @@ using namespace std;
 int main(){
     vector<int> size = {3,2};
     double data[6]={0.1, 1.2, 2.2, 3.1, 4.9, 5.2};
-    ts::Tensor<int> t = ts::Tensor<int>(size);
+    ts::Tensor<double> t = ts::Tensor<double>(data, size);
     
     cout << t.get_type() << endl;
     cout << t.get_data() << endl;
@@ -39,8 +39,13 @@ int main(){
     cout << endl;
 
     cout << t;
-    
 
+    // t = t.transpose(1, 0);
 
+    // cout << t;
+
+    vector<int> indexing_vector = vector<int>({-1, 1});
+    t = t.indexing(indexing_vector);
+    cout << t;
     return 0;
 }

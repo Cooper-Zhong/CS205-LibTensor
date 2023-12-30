@@ -3,6 +3,7 @@
 #include <string>    // std::string
 #include <memory>
 #include <stdexcept>
+#include <stack>
 
 
 #ifndef TENSOR_H_
@@ -465,6 +466,54 @@ namespace ts
 
     template <typename T>
     Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int & dim){
+        // Check if the number of dimensions is equal
+        if (ndim != other.ndim)
+        {
+            throw std::invalid_argument("The number of dimensions must be equal.");
+        }
+
+        // Check if the dimension is valid
+        if (dim < 0 || dim >= ndim)
+        {
+            throw std::invalid_argument("The dimension is out of range.");
+        }
+
+        // Check if the shapes are valid
+        std::vector<int> new_shape = shape;
+        std::vector<int> other_shape = other.shape;
+        for (int i = 0; i < ndim; i++)
+        {
+            if (i != dim)
+            {
+                if (new_shape[i] != other_shape[i])
+                {
+                    throw std::invalid_argument("The shapes are not valid.");
+                }
+            }
+        }
+        new_shape[dim] += other_shape[dim];
+
+        // create new tensor with new data
+        // Calculate the new data length
+        int new_data_length = 1;
+        for (int axis : new_shape)
+        {
+            new_data_length *= axis;
+        }
+        shared_ptr<T[]> new_data(new T[new_data_length]);
+        
+
+        // Calcualte the new strides
+        std::vector<int> new_stride;
+        int data_l = new_data_length;
+        for (int i = 0; i < ndim; i++)
+        {
+            data_l/=new_shape[i];
+            new_stride.push_back(data_l);
+        }
+
+        // Copy data element by element
+
         
     }
 
