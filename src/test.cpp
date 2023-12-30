@@ -6,9 +6,10 @@
 using namespace std;
 
 int main(){
-    vector<int> size = {3,2};
+    vector<int> size = {3,4,2};
+    vector<int> size_1 = {4,4,4};
     double data[6]={0.1, 1.2, 2.2, 3.1, 4.9, 5.2};
-    ts::Tensor<double> t = ts::Tensor<double>(data, size);
+    ts::Tensor<double> t = ts::Tensor<double>::eye_tensor(size_1);
     
     cout << t.get_type() << endl;
     cout << t.get_data() << endl;

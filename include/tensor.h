@@ -4,6 +4,8 @@
 #include <memory>
 #include <stdexcept>
 #include <stack>
+#include <random>
+#include <iostream>
 
 
 #ifndef TENSOR_H_
@@ -33,6 +35,16 @@ namespace ts
         Tensor(const std::vector<int> &_shape);
 
         Tensor(const T* data, const std::vector<int> &_shape);
+
+        static Tensor<T> rand_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> zeros_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> ones_tensor(const std::vector<int> &_shape);
+
+        static Tensor<T> full_tensor(const std::vector<int> &_shape, T t);
+
+        static Tensor<T> eye_tensor(const std::vector<int> &_shape);
 
         // Destructor
         ~Tensor();
@@ -69,6 +81,30 @@ namespace ts
         Tensor<T> cat(const Tensor<T> &other, const int & dim);
         template <typename T1>
         friend std::ostream & operator<<(std::ostream & o, Tensor<T1> &t);
+
+        /**
+         * @brief 重载运算符
+         */
+        Tensor<bool> operator==(const Tensor<T> &t); // 等于
+        Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
+        Tensor<bool> operator>(const Tensor<T> &t);  // 大于
+        Tensor<bool> operator<(const Tensor<T> &t);  // 小于
+        Tensor<bool> operator>=(const Tensor<T> &t); // 大于等于
+        Tensor<bool> operator<=(const Tensor<T> &t); // 小于等于
+        template <typename U>
+        friend Tensor<bool> eq(const Tensor<T> &t1, const Tensor<T> &t2); // 等于
+        template <typename U>
+        friend Tensor<bool> ne(const Tensor<T> &t1, const Tensor<T> &t2); // 不等于
+        template <typename U>
+        friend Tensor<bool> gt(const Tensor<T> &t1, const Tensor<T> &t2); // 大于
+        template <typename U>
+        friend Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2); // 小于
+        template <typename U>
+        friend Tensor<bool> ge(const Tensor<T> &t1, const Tensor<T> &t2); // 大于等于
+        template <typename U>
+        friend Tensor<bool> le(const Tensor<T> &t1, const Tensor<T> &t2); // 小于等于
+
+        static void checkShape(Tensor<T> &t1, Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
     };
 
     // Default Constructor
@@ -130,6 +166,90 @@ namespace ts
         // Allocate memory for data and copy the content
         data = std::shared_ptr<T[]>(new T[data_length]);
         std::copy(_data, _data + data_length, data.get());
+    }
+
+    // rand_tensor method implementation
+    template <typename T>
+    Tensor<T> Tensor<T>::rand_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> random_tensor(_shape);
+
+        // Generate random numbers for real number types
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        // std::uniform_real_distribution<T> dis(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+        std::uniform_real_distribution<T> dis(-10, 10);
+        for (int i = 0; i < random_tensor.data_length; i++)
+        {
+            random_tensor.data[i] = dis(gen);
+        }
+
+        return random_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::zeros_tensor(const std::vector<int> &_shape)
+    {
+        return Tensor<T>(_shape);
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::ones_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> ones_tensor(_shape);
+
+        // Initialize all elements to one
+        for (int i = 0; i < ones_tensor.data_length; i++)
+        {
+            ones_tensor.data[i] = 1;
+        }
+
+        return ones_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::full_tensor(const std::vector<int> &_shape, T t)
+    {
+        Tensor<T> full_tensor(_shape);
+
+        // Initialize all elements to the specified value 't'
+        for (int i = 0; i < full_tensor.data_length; i++)
+        {
+            full_tensor.data[i] = t;
+        }
+
+        return full_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::eye_tensor(const std::vector<int> &_shape)
+    {
+        Tensor<T> eye_tensor(_shape);
+
+        // Check if the shape is square
+        if (_shape.size() < 2 || !std::equal(_shape.begin(), _shape.end()-1, _shape.begin() + 1, std::equal_to<int>()))
+        {
+            throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+        }
+
+        // Initialize as an identity matrix
+        T * data=eye_tensor.get_data().get();
+        T * current = data;
+        auto stride = eye_tensor.get_stride();
+
+        for (int i = 0; i < _shape[0]; i++)
+        {
+            current = data;
+            for (int j = 0; j < _shape.size(); j++)
+            {
+                current += i*stride[j];
+            }
+            *current = 1;
+        }
+        
+
+        return eye_tensor;
     }
 
     // Destructor
@@ -207,7 +327,13 @@ namespace ts
                     o << ", ";
                 }
             }
-            o << "]" << std::endl;
+            o << "]";
+            if (layer > 0)
+            {
+                o << ",";
+            }
+            o << std::endl;
+            
         }
         else{
             o << std::endl;
@@ -215,7 +341,18 @@ namespace ts
             {
                 recurse_print(shape, stride, layer+1, data+stride[layer]*i, ndim);
             }
-            o << "]" << std::endl;
+            for (int i = 0; i < layer; i++)
+            {
+                o << " ";
+            }
+            
+            o << "]";
+            if (layer > 0 )
+            {
+                o << ",";
+            }
+            o << std::endl;
+            
         }        
     }
 
@@ -516,6 +653,179 @@ namespace ts
 
         
     }
+
+    // Cooper ====================================
+
+    /**
+     * @brief 重载运算符
+     */
+
+    template <typename T>
+    void checkShape(Tensor<T> &t1, Tensor<T> &t2)
+    {
+        if (t1.get_type() != t2.get_type())
+        {
+            throw std::runtime_error("Tensor type mismatch");
+        }
+        if (t1.ndim != t2.ndim)
+        {
+            throw std::runtime_error("Tensor dimension mismatch");
+        }
+        for (int i = 0; i < t1.ndim; i++)
+        {
+            if (t1.shape[i] != t2.shape[i])
+            {
+                throw std::runtime_error("Tensor shape mismatch");
+            }
+        }
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator==(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] == t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator!=(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] != t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator>(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] > t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator<(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] < t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator>=(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] >= t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> Tensor<T>::operator<=(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<bool> result;
+        result.ndim = this->ndim;
+        result.shape = this->shape;
+        result.stride = this->stride;
+        result.data_length = this->data_length;
+        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
+
+        for (int i = 0; i < this->data_length; i++)
+        {
+            result.data[i] = (this->data[i + this->offset] <= t.data[i + t.offset]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<bool> eq(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 == t2;
+    }
+
+    template <typename T>
+    Tensor<bool> ne(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 != t2;
+    }
+
+    template <typename T>
+    Tensor<bool> gt(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 > t2;
+    }
+
+    template <typename T>
+    Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 < t2;
+    }
+
+    template <typename T>
+    Tensor<bool> ge(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 >= t2;
+    }
+
+    template <typename T>
+    Tensor<bool> le(const Tensor<T> &t1, const Tensor<T> &t2)
+    {
+        return t1 <= t2;
+    }
+
+    // ==================================== Cooper
+
 
 } // namespace ts
 
