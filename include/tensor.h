@@ -84,6 +84,7 @@ namespace ts
         /**
          * @brief 重载运算符
          */
+        Tensor<T>& operator=(const Tensor<T> &t); //copy
         Tensor<bool> operator==(const Tensor<T> &t); // 等于
         Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
         Tensor<bool> operator>(const Tensor<T> &t);  // 大于
@@ -358,11 +359,11 @@ namespace ts
     template <typename T>
     std::ostream & operator<<(std::ostream & o, Tensor<T> & t)
     {
-        o << "Data pointer: " << t.get_data() << std::endl;
-        o << "Data length: " << t.get_data_length() << std::endl;
-        o << "Type: " << t.get_type() << std::endl;
-        o << "Offset: " << t.get_offset() << std::endl;
-        o << "Ndim:" << t.get_ndim() << std::endl;
+        // o << "Data pointer: " << t.get_data() << std::endl;
+        // o << "Data length: " << t.get_data_length() << std::endl;
+        // o << "Type: " << t.get_type() << std::endl;
+        o << "Offset: " << t.get_offset() << " ";
+        o << "Ndim:" << t.get_ndim() << " ";
         auto t_shape = t.get_shape();
         o << "Shape: [";
         for (int i = 0; i < t_shape.size(); i++)
@@ -373,7 +374,7 @@ namespace ts
                 o << ", ";
             }
         }
-        o << "]" << std::endl;
+        o << "]" << " ";
 
 
         auto t_stride = t.get_stride();
@@ -394,6 +395,67 @@ namespace ts
         
         return o;
     }
+
+    template <typename T>
+    Tensor<T>& Tensor<T>::operator=(const Tensor<T> &t){
+        
+        if (this->shape.size()!=t.shape.size()||!std::equal(this->shape.begin(),this->shape.end(),t.shape.begin(), std::equal_to<int>()))
+        {
+            throw std::invalid_argument("copy is only supported for tensors of the same shape.");
+        }
+        else
+        {
+            std::vector<int> index=std::vector<int>(this->ndim,0);
+            int top=this->ndim-1;
+            T* data_this = this->data.get()+this->offset;
+            T* data_copy = t.data.get()+t.offset;
+            T* current_this = data_this;
+            T* current_copy = data_copy;
+
+            
+            while (index[0]<this->shape[0])
+            {
+
+                current_this = data_this;
+                current_copy = data_copy;
+                for (int i = 0; i < this->ndim; i++)
+                {
+                    current_this += index[i]*this->stride[i];
+                    current_copy += index[i]*t.stride[i];
+                }
+
+                *current_this = *current_copy;
+                index[top]++;
+                while (index[top] == this->shape[top])
+                {
+                    top--;
+                    if (top<0)
+                    {
+                        break;
+                    }
+                    index[top]++;
+                }
+                if (top < 0)
+                {
+                    break;
+                }
+                while (top < this->ndim-1)
+                {
+                    top++;
+                    index[top]=0;
+                }
+                
+            }
+            
+        }
+
+        
+        
+
+
+        return *this;
+    }
+
 
 
 
