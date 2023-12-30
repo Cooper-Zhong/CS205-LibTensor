@@ -499,7 +499,7 @@ namespace ts
             {
                 throw std::invalid_argument("The number of indices for each dimension must be equal to 2.");
             }
-            if (indices[i][0] < 0 || indices[i][0] >= shape[i] || indices[i][1] < 0 || indices[i][1] >= shape[i])
+            if (indices[i][0] < 0 || indices[i][0] > shape[i] || indices[i][1] < 0 || indices[i][1] > shape[i])
             {
                 throw std::invalid_argument("Slicing: The indices are out of range.");
             }
