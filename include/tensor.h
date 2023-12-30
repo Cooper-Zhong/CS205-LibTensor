@@ -496,9 +496,9 @@ namespace ts
             {
                 throw std::invalid_argument("The number of indices for each dimension must be equal to 2.");
             }
-            if (indices[i][0] < 0 || indices[i][0] >= shape[i] || indices[i][1] < 0 || indices[i][1] > shape[i])
+            if (indices[i][0] < 0 || indices[i][0] > shape[i] || indices[i][1] < 0 || indices[i][1] > shape[i])
             {
-                throw std::invalid_argument("The indices are out of range.");
+                throw std::invalid_argument("Slicing: The indices are out of range.");
             }
         }
 
@@ -895,16 +895,14 @@ namespace ts
                 throw std::invalid_argument("The dimensions must be greater than 0.");
             }
         }
-
-        Tensor<T> * tensor_t = this;
+        Tensor<T> tensor = *this;
         // Check if the number of dimensions is equal
         if (dims.size() < ndim)
         {
             dims.insert(dims.begin(), ndim - dims.size(), 1);
         }else if(dims.size() > ndim){
-            tensor_t = this->unsqueeze(dims.size());
+            tensor = this->unsqueeze(dims.size());
         }
-        Tensor<T> tensor = *tensor_t;
 
         // Calculate the new shape
         std::vector<int> new_shape;
@@ -916,12 +914,13 @@ namespace ts
         Tensor<T> new_tensor = Tensor<T>(new_shape);
 
         // fill in new data
-        std::vector<int> index = std::vector<int>(dims,0);
+        std::vector<int> index = std::vector<int>(dims.size(),0);
         int top = dims.size() - 1;        
-        while (index[0] < this->shape[0])
+        while (true)
         {
             // copy at here
             std::vector<std::vector<int>> slicing_indices;
+            
             for (int i = 0; i < dims.size(); i++)
             {
                 slicing_indices.push_back({index[i]*shape[i], (index[i]+1)*shape[i]});
