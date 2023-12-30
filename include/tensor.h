@@ -121,6 +121,11 @@ namespace ts
         friend Tensor<bool> le(const Tensor<T> &t1, const Tensor<T> &t2); // 小于等于
 
         static void checkShape(Tensor<T> &t1, Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
+
+        static Tensor<T> re_construct(const Tensor<T> & t);
+
+        
+
     };
 
     // Default Constructor
@@ -1063,6 +1068,14 @@ namespace ts
     }
 
     // ==================================== Cooper
+
+    template <typename T>
+    Tensor<T> re_construct(const Tensor<T> & t)
+    {
+        Tensor<T> result = Tensor<T>(t.shape);
+        result = t;
+        return result;
+    }
 
 
 } // namespace ts
