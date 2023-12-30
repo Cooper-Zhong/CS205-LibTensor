@@ -23,6 +23,37 @@ int main(){
     cout << "t1:\n" << t1;
     cout << "t2:\n" << t2;
     
+    double d=1.5;
+
+
+    ts::Tensor<double> res(t1.get_shape());
+    res = t1.add(t2);
+    cout << res;
+    res = t1.add(d);
+    cout << res;
+
+    res = t1.sub(t2);
+    cout << res;
+    res = t1.sub(d);
+    cout << res;
+
+    res = t1.mul(t2);
+    cout << res;
+    res = t1.mul(d);
+    cout << res;
+
+    res = t1.div(t2);
+    cout << res;
+    res = t1.div(d);
+    cout << res;
+
+    res = t1.log(t2);
+    cout << res;
+    res = t1.log(d);
+    cout << res;
+
+
+
     
     
     
@@ -67,8 +98,8 @@ int main(){
 
     // cout << t;
 
-    vector<int> indexing_vector = vector<int>({-1, 1});
-    t = t.indexing(indexing_vector);
-    cout << t;
+    // vector<int> indexing_vector = vector<int>({-1, 1});
+    // t = t.indexing(indexing_vector);
+    // cout << t;
     return 0;
 }
