@@ -3,6 +3,7 @@
 #include <string>    // std::string
 #include <memory>
 #include <stdexcept>
+#include <stack>
 #include <random>
 #include <iostream>
 
@@ -78,6 +79,17 @@ namespace ts
         Tensor<T> transpose(const int& dim1, const int & dim2);
 
         Tensor<T> cat(const Tensor<T> &other, const int & dim);
+
+        bool is_contiguous();
+
+        Tensor<T> contiguous();
+
+        Tensor<T> reshape(const std::vector<int> &shape);
+
+        Tensor<T> squeeze();
+
+        void view(const std::vector<int> &shape);
+
         template <typename T1>
         friend std::ostream & operator<<(std::ostream & o, Tensor<T1> &t);
 
@@ -493,13 +505,6 @@ namespace ts
             new_shape.push_back(indices[i][1] - indices[i][0]);
         }
 
-        // Calculate the new data length
-        int new_data_length = 1;
-        for (int axis : new_shape)
-        {
-            new_data_length *= axis;
-        }
-
         // Calculate the new offset
         int new_offset = offset;
         for (int i = 0; i < ndim; i++)
@@ -512,7 +517,7 @@ namespace ts
         new_tensor.data = data;
         new_tensor.offset = new_offset;
         new_tensor.ndim = ndim;
-        new_tensor.data_length = new_data_length;
+        new_tensor.data_length = data_length;
         new_tensor.shape = new_shape;
         new_tensor.stride = stride;
 
@@ -555,13 +560,6 @@ namespace ts
             }
         }
 
-        // Calculate the new data length
-        int new_data_length = 1;
-        for (int axis : new_shape)
-        {
-            new_data_length *= axis;
-        }
-
         // Calculate the new offset
         int new_offset = offset;
         for (int i = 0; i < ndim; i++)
@@ -577,7 +575,7 @@ namespace ts
         new_tensor.data = data;
         new_tensor.offset = new_offset;
         new_tensor.ndim = ndim;
-        new_tensor.data_length = new_data_length;
+        new_tensor.data_length = data_length;
         new_tensor.shape = new_shape;
         new_tensor.stride = stride;
 
@@ -669,69 +667,160 @@ namespace ts
 
     template <typename T>
     Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int & dim){
-        
-    }
-
-    // Cooper ====================================
-
-    /**
-     * @brief 重载运算符
-     */
-
-    template <typename T>
-    void checkShape(Tensor<T> &t1, Tensor<T> &t2)
-    {
-        if (t1.get_type() != t2.get_type())
+        // Check if the number of dimensions is equal
+        if (ndim != other.ndim)
         {
-            throw std::runtime_error("Tensor type mismatch");
+            throw std::invalid_argument("The number of dimensions must be equal.");
         }
-        if (t1.ndim != t2.ndim)
+
+        // Check if the dimension is valid
+        if (dim < 0 || dim >= ndim)
         {
-            throw std::runtime_error("Tensor dimension mismatch");
+            throw std::invalid_argument("The dimension is out of range.");
         }
-        for (int i = 0; i < t1.ndim; i++)
+
+        // Check if the shapes are valid
+        std::vector<int> new_shape = shape;
+        std::vector<int> other_shape = other.shape;
+        for (int i = 0; i < ndim; i++)
         {
-            if (t1.shape[i] != t2.shape[i])
+            if (i != dim)
             {
-                throw std::runtime_error("Tensor shape mismatch");
+                if (new_shape[i] != other_shape[i])
+                {
+                    throw std::invalid_argument("The shapes are not valid.");
+                }
             }
         }
+        new_shape[dim] += other_shape[dim];
+
+        Tensor<T> new_tensor(new_shape);
+    }
+    template <typename T>
+    bool Tensor<T>::is_contiguous(){
+        size_t true_data_length = 1;
+        for (int axis : shape)
+        {
+            true_data_length *= axis;
+        }
+
+        if (true_data_length != data_length)
+        {
+            return false;
+        }
+
+        int stride = 1;
+        for(int i = ndim-1; i >= 0; i--){
+            if (stride != this->stride[i])
+            {
+                return false;
+            }
+            stride *= shape[i];
+        }
+        return true;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator==(const Tensor<T> &t)
-    {
-        checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
-
-        for (int i = 0; i < this->data_length; i++)
-        {
-            result.data[i] = (this->data[i + this->offset] == t.data[i + t.offset]);
+    Tensor<T> Tensor<T>::contiguous(){
+        // Check contiguous of the tensor
+        if(is_contiguous()){
+            return *this;
         }
-        return result;
+
+
+        // Create a new tensor
+        Tensor<T> new_tensor = Tensor<T>(shape);
+
+        // Copy data element by element
+
+ 
+        return new_tensor;
+    }
+    
+
+    template <typename T>
+    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape){
+        // check contiguous of the tensor
+        if(!is_contiguous()){
+            throw std::invalid_argument("The tensor is not contiguous.");
+        }
+
+        // Check if the number of elements is equal
+        int num_elements = 1;
+        for (int axis : shape)
+        {
+            num_elements *= axis;
+        }
+        if (num_elements != data_length) // contiguous tensor must hava true data_length
+        {
+            throw std::invalid_argument("The number of elements must be equal.");
+        }
+
+        // Create a new tensor
+        Tensor<T> new_tensor;
+        new_tensor.data = data;
+        new_tensor.offset = offset;
+        new_tensor.ndim = shape.size();
+        new_tensor.data_length = data_length;
+        new_tensor.shape = shape;
+
+        // Calculate the new stride
+        std::vector<int> new_stride;
+        int data_l = data_length;
+        for (int i = 0; i < ndim; i++)
+        {
+            data_l/=shape[i];
+            new_stride.push_back(data_l);
+        }
+        new_tensor.stride = new_stride;
+
+        return new_tensor;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator!=(const Tensor<T> &t)
-    {
-        checkShape(*this, t);
-        Tensor<bool> result;
-        result.ndim = this->ndim;
-        result.shape = this->shape;
-        result.stride = this->stride;
-        result.data_length = this->data_length;
-        result.data = std::shared_ptr<bool[]>(new bool[this->data_length]);
-
-        for (int i = 0; i < this->data_length; i++)
+    Tensor<T> Tensor<T>::squeeze(){
+        // Check if the tensor is a vector
+        if (ndim == 1)
         {
-            result.data[i] = (this->data[i + this->offset] != t.data[i + t.offset]);
+            throw std::invalid_argument("The tensor is already a vector.");
         }
-        return result;
+
+        // Calculate the new shape
+        std::vector<int> new_shape;
+        for (int axis : shape)
+        {
+            if (axis != 1)
+            {
+                new_shape.push_back(axis);
+            }
+        }
+
+        // Create a new tensor
+        Tensor<T> new_tensor;
+        new_tensor.data = data;
+        new_tensor.offset = offset;
+        new_tensor.ndim = new_shape.size();
+        new_tensor.data_length = data_length;
+        new_tensor.shape = new_shape;
+
+        // Calculate the new stride
+        std::vector<int> new_stride;
+        int data_l = data_length;
+        for (int i = 0; i < ndim; i++)
+        {
+            data_l/=shape[i];
+            new_stride.push_back(data_l);
+        }
+        new_tensor.stride = new_stride;
+
+        return new_tensor;
+    }
+
+    template<typename T>
+    void Tensor<T>::view(const std::vector<int> &shape){
+        Tensor<T> reshaped_tensor = reshape(shape);
+        //output
+        std::cout << reshaped_tensor << std::endl;
     }
 
     template <typename T>

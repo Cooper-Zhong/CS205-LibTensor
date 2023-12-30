@@ -63,6 +63,12 @@ int main(){
     
     
 
+    // t = t.transpose(1, 0);
 
+    // cout << t;
+
+    vector<int> indexing_vector = vector<int>({-1, 1});
+    t = t.indexing(indexing_vector);
+    cout << t;
     return 0;
 }
