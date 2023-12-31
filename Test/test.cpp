@@ -78,10 +78,10 @@ int main() {
 //    ts::Tensor sum = ts::sum(t, 0);
 //    cout << sum << endl;
 
-//    ts::Tensor mean = ts::mean(t, 2);
+//    ts::Tensor mean = ts::mean(t1, 2);
 //    cout << mean << endl;
-    ts::Tensor min = ts::min(t1, 1);
-    cout << min << endl;
+    // ts::Tensor min = ts::min(t1, 1);
+    // cout << min << endl;
 //    ts::Tensor max = ts::max(t, 0);
 //    cout << max << endl;
 
