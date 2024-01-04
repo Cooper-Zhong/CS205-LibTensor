@@ -858,23 +858,11 @@ namespace ts
         }
 
         // Create a new tensor
-        Tensor<T> new_tensor;
+        Tensor<T> new_tensor(shape);
         new_tensor.data = data;
         new_tensor.offset = offset;
-        new_tensor.ndim = shape.size();
         new_tensor.data_length = data_length;
-        new_tensor.shape = shape;
-
-        // Calculate the new stride
-        std::vector<int> new_stride;
-        int data_l = data_length;
-        for (int i = 0; i < ndim; i++)
-        {
-            data_l /= shape[i];
-            new_stride.push_back(data_l);
-        }
-        new_tensor.stride = new_stride;
-
+        
         return new_tensor;
     }
 
