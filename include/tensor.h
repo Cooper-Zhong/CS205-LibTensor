@@ -7,7 +7,8 @@
 #include <random>
 #include <iostream>
 #include <cmath>
-
+#include <map>
+#include <cassert>
 
 #ifndef TENSOR_H_
 #define TENSOR_H_
@@ -49,7 +50,7 @@ namespace ts
 
         std::string get_type() const;
 
-        std::shared_ptr<T[]> get_data();
+        std::shared_ptr<T[]> get_data() const;
 
         int get_offset() const;
 
@@ -61,16 +62,18 @@ namespace ts
 
         const std::vector<int> &get_stride() const;
 
-        Tensor<T> slicing(const std::vector<std::vector<int>> &indices);
+        Tensor<T> slicing(const std::vector<std::vector<int>> &indices) const;
 
         // use -1 to indicate all elements
-        Tensor<T> indexing(const std::vector<int> &indices);
+        Tensor<T> indexing(const std::vector<int> &indices) const;
 
         // alias for slicing
-        Tensor<T> operator()(const std::vector<std::vector<int>> &indices);
+        Tensor<T> operator()(const std::vector<std::vector<int>> &indices) const;
 
         // alias for indexing
-        Tensor<T> operator()(const std::vector<int> &indices);
+        Tensor<T> operator()(const std::vector<int> &indices) const;
+
+        T &enisum_indexing(const std::vector<int> &indices) const;
 
         Tensor<T> permute(const std::vector<int> &axes);
 
@@ -114,7 +117,8 @@ namespace ts
 
         static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
 
-        
+        template <typename U>
+        friend Tensor<T> einsum(const std::string &equation, const std::vector<Tensor<T>> &tensors); // einsum
 
         /**
          * @brief reduction operation: sum, mean, max, min
@@ -149,55 +153,73 @@ namespace ts
         template <typename U>
         friend Tensor<U> min(const Tensor<U> &t, const int &dim);
 
-        static Tensor<T> re_construct(const Tensor<T> & t);
+        static Tensor<T> re_construct(const Tensor<T> &t);
 
         Tensor<T> add(const Tensor<T> &t);
+
         Tensor<T> add(T value);
+
         Tensor<T> operator+(const Tensor<T> &t);
+
         Tensor<T> operator+(T value);
+
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
+
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
 
         Tensor<T> sub(const Tensor<T> &t);
+
         Tensor<T> sub(T value);
+
         Tensor<T> operator-(const Tensor<T> &t);
+
         Tensor<T> operator-(T value);
+
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2);
+
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, Y value);
 
         Tensor<T> mul(const Tensor<T> &t);
+
         Tensor<T> mul(T value);
+
         Tensor<T> operator*(const Tensor<T> &t);
+
         Tensor<T> operator*(T value);
+
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
+
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
         Tensor<T> div(const Tensor<T> &t);
+
         Tensor<T> div(T value);
+
         Tensor<T> operator/(const Tensor<T> &t);
+
         Tensor<T> operator/(T value);
+
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
+
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
         Tensor<T> log(const Tensor<T> &t);
+
         Tensor<T> log(T value);
+
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
+
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, Y value);
-        
-
-        
-
-        
     };
 
     // Default Constructor
@@ -360,7 +382,7 @@ namespace ts
 
     // Get the shared pointer to the data
     template <typename T>
-    std::shared_ptr<T[]> Tensor<T>::get_data()
+    std::shared_ptr<T[]> Tensor<T>::get_data() const
     {
         return data;
     }
@@ -376,7 +398,7 @@ namespace ts
     template <typename T>
     int Tensor<T>::get_ndim() const
     {
-        
+
         return ndim;
     }
 
@@ -546,7 +568,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::slicing(const std::vector<std::vector<int>> &indices)
+    Tensor<T> Tensor<T>::slicing(const std::vector<std::vector<int>> &indices) const
     {
         // Check if the number of indices is equal to the number of dimensions
         if (indices.size() != ndim)
@@ -594,13 +616,13 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::operator()(const std::vector<std::vector<int>> &indices)
+    Tensor<T> Tensor<T>::operator()(const std::vector<std::vector<int>> &indices) const
     {
         return slicing(indices);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::indexing(const std::vector<int> &indices)
+    Tensor<T> Tensor<T>::indexing(const std::vector<int> &indices) const
     {
         // Check if the number of indices is equal to the number of dimensions
         if (indices.size() != ndim)
@@ -654,7 +676,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::operator()(const std::vector<int> &indices)
+    Tensor<T> Tensor<T>::operator()(const std::vector<int> &indices) const
     {
         return indexing(indices);
     }
@@ -983,15 +1005,17 @@ namespace ts
                 throw std::invalid_argument("The dimensions must be greater than 0.");
             }
         }
-Tensor<T> tensor = *this;
+        Tensor<T> tensor = *this;
         // Check if the number of dimensions is equal
         if (dims.size() < ndim)
         {
             dims.insert(dims.begin(), ndim - dims.size(), 1);
-}else if(dims.size() > ndim){
+        }
+        else if (dims.size() > ndim)
+        {
             tensor = this->unsqueeze(dims.size());
         }
-        
+
         // Calculate the new shape
         std::vector<int> new_shape;
         for (int i = 0; i < ndim; i++)
@@ -1002,7 +1026,7 @@ Tensor<T> tensor = *this;
         Tensor<T> new_tensor = Tensor<T>(new_shape);
 
         // fill in new data
-        std::vector<int> index = std::vector<int>(dims.size(),0);
+        std::vector<int> index = std::vector<int>(dims.size(), 0);
         int top = dims.size() - 1;
         while (true)
         {
@@ -1011,7 +1035,7 @@ Tensor<T> tensor = *this;
 
             for (int i = 0; i < dims.size(); i++)
             {
-                slicing_indices.push_back({index[i]*shape[i], (index[i]+1)*shape[i]});
+                slicing_indices.push_back({index[i] * shape[i], (index[i] + 1) * shape[i]});
             }
             new_tensor(slicing_indices) = tensor;
 
@@ -1019,7 +1043,7 @@ Tensor<T> tensor = *this;
             while (index[top] == dims[top])
             {
                 top--;
-                if (top<0)
+                if (top < 0)
                 {
                     break;
                 }
@@ -1032,7 +1056,7 @@ Tensor<T> tensor = *this;
             while (top < dims.size() - 1)
             {
                 top++;
-                index[top]=0;
+                index[top] = 0;
             }
         }
 
@@ -1371,47 +1395,50 @@ Tensor<T> tensor = *this;
         return result;
     }
 
-
-
     template <typename T>
     Tensor<T> Tensor<T>::add(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> t2=t.contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]+t2.data[i];
+            result.data[i] = t1.data[i] + t2.data[i];
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::add(T value)
     {
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]+value;
+            result.data[i] = t1.data[i] + value;
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator+(const Tensor<T> &t)
     {
         return this->add(t);
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator+(T value)
     {
         return this->add(value);
     }
+
     template <typename Y>
     Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {
         return t1.add(t2);
     }
+
     template <typename Y>
     Tensor<Y> add(const Tensor<Y> &t1, Y value)
     {
@@ -1422,41 +1449,46 @@ Tensor<T> tensor = *this;
     Tensor<T> Tensor<T>::sub(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> t2=t.contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]+t2.data[i];
+            result.data[i] = t1.data[i] + t2.data[i];
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::sub(T value)
     {
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]-value;
+            result.data[i] = t1.data[i] - value;
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator-(const Tensor<T> &t)
     {
         return this->sub(t);
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator-(T value)
     {
         return this->sub(value);
     }
+
     template <typename Y>
     Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {
         return t1.sub(t2);
     }
+
     template <typename Y>
     Tensor<Y> sub(const Tensor<Y> &t1, Y value)
     {
@@ -1464,43 +1496,49 @@ Tensor<T> tensor = *this;
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::mul(const Tensor<T> &t){
+    Tensor<T> Tensor<T>::mul(const Tensor<T> &t)
+    {
         checkShape(*this, t);
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> t2=t.contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]*t2.data[i];
+            result.data[i] = t1.data[i] * t2.data[i];
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::mul(T value)
     {
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]*value;
+            result.data[i] = t1.data[i] * value;
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator*(const Tensor<T> &t)
     {
         return this->mul(t);
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator*(T value)
     {
         return this->mul(value);
     }
+
     template <typename Y>
     Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {
         return t1.mul(t2);
     }
+
     template <typename Y>
     Tensor<Y> mul(const Tensor<Y> &t1, Y value)
     {
@@ -1511,41 +1549,46 @@ Tensor<T> tensor = *this;
     Tensor<T> Tensor<T>::div(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> t2=t.contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]/t2.data[i];
+            result.data[i] = t1.data[i] / t2.data[i];
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::div(T value)
     {
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=t1.data[i]/value;
+            result.data[i] = t1.data[i] / value;
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator/(const Tensor<T> &t)
     {
         return this->div(t);
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::operator/(T value)
     {
         return this->div(value);
     }
+
     template <typename Y>
     Tensor<Y> div(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {
         return t1.div(t2);
     }
+
     template <typename Y>
     Tensor<Y> div(const Tensor<Y> &t1, Y value)
     {
@@ -1556,37 +1599,222 @@ Tensor<T> tensor = *this;
     Tensor<T> Tensor<T>::log(const Tensor<T> &t)
     {
         checkShape(*this, t);
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> t2=t.contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i] = std::log(t1.data[i])/std::log(t2.data[i]);
+            result.data[i] = std::log(t1.data[i]) / std::log(t2.data[i]);
         }
         return result;
     }
+
     template <typename T>
     Tensor<T> Tensor<T>::log(T value)
     {
-        Tensor<T> t1=this->contiguous();
-        Tensor<T> result=Tensor(this->shape);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i]=std::log(t1.data[i])/std::log(value);
+            result.data[i] = std::log(t1.data[i]) / std::log(value);
         }
         return result;
     }
+
     template <typename Y>
     Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {
         return t1.log(t2);
     }
+
     template <typename Y>
     Tensor<Y> log(const Tensor<Y> &t1, Y value)
     {
         return t1.log(value);
     }
 
+    template <typename T>
+    // 返回从start到end的等差数列tensor
+    Tensor<T> arange(const int start, const int end, const int step = 1)
+    {
+        int total_size = (end - start) / step;
+        T *data = new T[total_size];
+        for (int i = 0; i < total_size; i++)
+        {
+            data[i] = start + i * step;
+        }
+        Tensor<T> res = Tensor<T>(data, {total_size});
+        delete[] data;
+        return res;
+    }
+
+    template <typename T>
+    T &Tensor<T>::enisum_indexing(const std::vector<int> &indices) const // 用于einsum, 根据indices获取tensor的值
+    {
+        int id = offset;
+        for (int i = 0; i < ndim; i++)
+        {
+            id += indices[i] * stride[i];
+        }
+        return data.get()[id];
+    }
+
+    template <typename T>
+    Tensor<T> einsum(const std::string &equation, const std::vector<Tensor<T>> &tensors)
+    {
+        std::map<char, int> dims;                  // 用于存储每个维度的大小
+        std::map<char, int> cur_index;             // 用于迭代的当前索引
+        std::vector<char> dim_iter_order;          // 用于迭代的维度顺序
+        std::vector<std::vector<char>> input_dims; // 每个输入Tensor的维度对应的字母 "ijk,ikl->ij" -> {{'i','j','k'},{'i','k','l'}}
+        std::vector<char> output_part;             // 输出Tensor的维度对应的字母
+        bool is_input_part = true;
+        bool is_scalar_output = false;
+        std::vector<char> input_part; // 临时存储输入Tensor的维度对应的字母
+
+        // 解析表达式
+        const auto arrow_pos = equation.find("->");
+        const auto lhs = equation.substr(0, arrow_pos);
+        const auto rhs = equation.substr(arrow_pos + 2);
+        for (char c : lhs)
+        {
+            if (c == ' ')
+            {
+                continue;
+            }
+            if (c == ',')
+            {
+                input_dims.push_back(input_part); // 一个输入Tensor的维度对应的字母
+                input_part.clear();
+            }
+            else
+            {
+                input_part.push_back(c);
+            }
+        }
+        for (char c : rhs)
+        {
+            if (c == ' ')
+            {
+                continue;
+            }
+            else
+            {
+                output_part.push_back(c);
+            }
+        }
+        is_scalar_output = output_part.size() == 0;
+
+        for (int i = 0; i < input_dims.size(); i++)
+        { // "ijk,ikl->ij" => {{'i','j','k'},{'i','k','l'}}
+            for (int j = 0; j < input_dims[i].size(); j++)
+            {
+                char c = input_dims[i][j];
+                if (dims.find(c) == dims.end())
+                { // 如果dims中没有这个维度
+                    dim_iter_order.push_back(c);
+                    dims[c] = tensors[i].get_shape()[j]; // 将这个维度的大小加入dims, 例 维度 i 的大小为 dims[i]
+                    cur_index[c] = 0;                    // 将这个维度的当前索引初始化为0
+                }
+                else
+                {
+                    // continue;
+                    assert(dims[c] == tensors[i].get_shape()[j]);
+                    // 如果dims中已经有这个维度了，那么这个维度的大小应该和当前输入Tensor的维度大小相同
+                }
+            }
+        }
+        // 在这里可以创建output矩阵
+        std::vector<int> result_shape;
+        if (is_scalar_output)
+        { // 标量
+            result_shape.push_back(1);
+        }
+        else
+        {
+            for (char c : output_part)
+            {
+                result_shape.push_back(dims[c]);
+            }
+        }
+        Tensor<T> result(result_shape);
+
+        // std::cout << "debug 1 " << std::endl;
+
+        bool done = false;
+        while (!done)
+        {
+            // 创建一个用于存储当前索引的vector
+            std::vector<T> index_for_each_input;
+
+            for (int i = 0; i < input_dims.size(); i++)
+            {
+                std::vector<int> indices;
+                for (char dim : input_dims[i])
+                {
+                    indices.push_back(cur_index[dim]);
+                }
+                // int start = tensors[i].get_offset();
+                // for (int i = 0; i < tensors[i].get_ndim(); i++)
+                // {
+                //     start += indices[i] * tensors[i].get_stride()[i];
+                // }
+                index_for_each_input.push_back(tensors[i].enisum_indexing(indices)); // 使用indices获取tensor的值
+            }
+            // std::cout << "debug 2 " << std::endl;
+
+            // 执行计算
+            T temp_result = 1; // 假设是乘法操作
+            for (auto value : index_for_each_input)
+            {
+                temp_result *= value;
+            }
+            std::cout << temp_result << std::endl;
+            // std::cout << "debug 3 " << std::endl;
+
+            if (is_scalar_output)
+            {
+                // std::cout << "debug 4 " << std::endl;
+                result({0}) = result({0}) + temp_result;
+                // std::cout << "debug 5 " << std::endl;
+            }
+            else
+            {
+                // 根据output_part计算输出索引
+                std::vector<int> output_indices;
+                for (char dim : output_part)
+                {
+                    output_indices.push_back(cur_index[dim]);
+                }
+                // std::cout << "debug 6 " << std::endl;
+
+                // 将结果累加到输出Tensor的相应位置
+                // result.enisum_indexing(output_indices) = result.enisum_indexing(output_indices) + temp_result;
+                result.enisum_indexing(output_indices) += temp_result;
+                // result(output_indices) = result(output_indices) + temp_result;
+                // std::cout << "debug 7 " << std::endl;
+            }
+
+            // 更新索引
+            for (int i = dim_iter_order.size() - 1; i >= 0; i--)
+            {
+                if (cur_index[dim_iter_order[i]] <
+                    dims[dim_iter_order[i]] - 1)
+                {                                   // 如果当前索引还没有到达这个维度的最大值
+                    cur_index[dim_iter_order[i]]++; // 将当前索引加1
+                    break;
+                }
+                else
+                {
+                    cur_index[dim_iter_order[i]] = 0; // 将当前索引重置为0
+                    if (i == 0)
+                    { // 如果当前索引已经到达了最后一个维度的最大值
+                        done = true;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
 } // namespace ts
 
