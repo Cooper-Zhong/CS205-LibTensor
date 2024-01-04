@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <vector>
 #include <iostream>
 #include "tensor.h"
