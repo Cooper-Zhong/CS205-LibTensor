@@ -32,7 +32,7 @@ ts::Tensor<double> create_test_tensor(vector<int> shape, bool output_progress = 
     // randomly permute the axes
     vector<int> axes(shape.size());
     iota(axes.begin(), axes.end(), 0);
-    random_shuffle(axes.begin(), axes.end());
+    shuffle(axes.begin(), axes.end(), std::mt19937(std::random_device()()));
 
     if (output_progress)
     {
