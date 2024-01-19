@@ -1,3 +1,5 @@
+
+
 #include <vector>
 #include <typeinfo> // typeid
 #include <string>   // std::string
@@ -16,7 +18,6 @@
 
 #ifndef TENSOR_H_
 #define TENSOR_H_
-
 namespace ts
 {
     // Tensor class
@@ -91,7 +92,7 @@ namespace ts
 
         Tensor<T> reshape(const std::vector<int> &shape);
 
-        Tensor<T> squeeze();
+        Tensor<T> squeeze() const;
 
         Tensor<T> unsqueeze(int new_dim);
 
@@ -167,8 +168,6 @@ namespace ts
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
-        template <typename Y>
-        friend Tensor<Y> add_cu(const Tensor<Y> &t1, const Tensor<Y> &t2);
 
         Tensor<T> sub(const Tensor<T> &t);
         Tensor<T> sub(T value);

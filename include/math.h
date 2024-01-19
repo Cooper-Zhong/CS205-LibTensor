@@ -1,6 +1,11 @@
-#pragma once
+
+#ifndef MATH_H
+#define MATH_H
+
 #include "tensor.h"
 #include "omp.h"
+
+
 namespace ts
 {
     /**
@@ -205,7 +210,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result;
+        return result.squeeze();
     }
 
     template <typename T>
@@ -276,7 +281,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result;
+        return result.squeeze();
     }
 
 
@@ -340,7 +345,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result;
+        return result.squeeze();
     }
 
     template <typename U>
@@ -743,3 +748,5 @@ namespace ts
         return result;
     }
 }
+
+#endif

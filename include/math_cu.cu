@@ -1,3 +1,6 @@
+#ifndef MATH_CU_CU_
+#define MATH_CU_CU_
+
 #include "tensor.h"
 
 namespace ts
@@ -41,3 +44,5 @@ namespace ts
 
 
 }
+
+#endif
