@@ -56,6 +56,10 @@ namespace ts
 
         std::string get_type() const;
 
+         std::string type() const;
+
+        std::string size() const;
+
         std::shared_ptr<T[]> get_data() const;
 
         int get_offset() const;
@@ -99,10 +103,10 @@ namespace ts
 
         Tensor<T> tile(std::vector<int> dims);
 
-        void view(const std::vector<int> &shape);
+        Tensor<T> view(const std::vector<int> &shape);
 
         template <typename T1>
-        friend std::ostream &operator<<(std::ostream &o, Tensor<T1> &t);
+        friend std::ostream &operator<<(std::ostream &o, const Tensor<T1> &t);
 
         /**
          * @brief 重载运算符
@@ -392,6 +396,52 @@ namespace ts
         return typeid(T).name();
     }
 
+    template <typename T>
+    std::string Tensor<T>::type() const
+    {
+        using namespace std;
+        std::string type = get_type();
+        std::string res = "";
+        if (type == "i")
+        {
+            res = "int";
+        }
+        else if (type == "d")
+        {
+            res = "double";
+        }
+        else if (type == "f")
+        {
+            res = "float";
+        }
+        else if (type == "b")
+        {
+            res = "bool";
+        }
+        else
+        {
+            res = type;
+        }
+        return res;
+    }
+
+    template <typename T>
+    std::string Tensor<T>::size() const
+    {
+        using namespace std;
+        std::string res = "[";
+        for (int i = 0; i < shape.size(); i++)
+        {
+            res += to_string(shape[i]);
+            if (i + 1 < shape.size())
+            {
+                res += ", ";
+            }
+        }
+        res += "]";
+        return res;
+    }
+
     // Get the shared pointer to the data
     template <typename T>
     std::shared_ptr<T[]> Tensor<T>::get_data() const
@@ -485,7 +535,7 @@ namespace ts
     }
 
     template <typename T>
-    std::ostream &operator<<(std::ostream &o, Tensor<T> &t)
+    std::ostream &operator<<(std::ostream &o, const Tensor<T> &t)
     {
         // o << "Data pointer: " << t.get_data() << std::endl;
         // o << "Data length: " << t.get_data_length() << std::endl;
