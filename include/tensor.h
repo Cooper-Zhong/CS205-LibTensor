@@ -12,6 +12,7 @@
 #include "math.h"
 #include "einsum.h"
 #include "transform.h"
+#include "serialize.h"
 
 #ifndef TENSOR_H_
 #define TENSOR_H_
@@ -187,6 +188,7 @@ namespace ts
 
         Tensor<T> div(const Tensor<T> &t);
         Tensor<T> div(T value);
+
         Tensor<T> operator/(const Tensor<T> &t);
         Tensor<T> operator/(T value);
         template <typename Y>
@@ -200,6 +202,22 @@ namespace ts
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, Y value);
+
+        // serialization
+        void serialize(std::string filename);
+        static Tensor<T> deserialize(std::string filename);
+
+        // openMP optimized version
+        Tensor<T> omp_add(const Tensor<T> &t);
+        Tensor<T> omp_add(T value);
+        Tensor<T> omp_sub(const Tensor<T> &t);
+        Tensor<T> omp_sub(T value);
+        Tensor<T> omp_mul(const Tensor<T> &t);
+        Tensor<T> omp_mul(T value);
+        Tensor<T> omp_div(const Tensor<T> &t);
+        Tensor<T> omp_div(T value);
+        Tensor<T> omp_log(const Tensor<T> &t);
+        Tensor<T> omp_log(T value);
         };
 
     // Default Constructor

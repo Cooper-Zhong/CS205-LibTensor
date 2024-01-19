@@ -1,5 +1,6 @@
 #pragma once
 #include "tensor.h"
+#include "omp.h"
 namespace ts
 {
     /**
@@ -539,5 +540,156 @@ namespace ts
     Tensor<Y> log(const Tensor<Y> &t1, Y value)
     {
         return t1.log(value);
+    }
+
+    // OpenMP Optimized Version
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_add(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] + t2.data[i];
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_add(T value)
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] + value;
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_sub(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] + t2.data[i];
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_sub(T value)
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] - value;
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_mul(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] * t2.data[i];
+        }
+        return result;
+    }
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_mul(T value)
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] * value;
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_div(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] / t2.data[i];
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_div(T value)
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = t1.data[i] / value;
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_log(const Tensor<T> &t)
+    {
+        checkShape(*this, t);
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> t2 = t.contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = std::log(t1.data[i]) / std::log(t2.data[i]);
+        }
+        return result;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::omp_log(T value)
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = std::log(t1.data[i]) / std::log(value);
+        }
+        return result;
     }
 }

@@ -21,12 +21,13 @@ foreach(TEST_FILE ${TEST_FILES})
 endforeach()
 
 find_package(benchmark REQUIRED)
+find_package(OpenMP)
 
 # Benchmark 文件
 foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
     # 输出与当前测试文件相关的源文件
     get_filename_component(BENCHMARK_NAME ${BENCHMARK_FILE} NAME_WE)
     add_executable(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES})
-    target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark)
+    target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
     target_compile_options(${BENCHMARK_NAME} PRIVATE -O3 -lpthread)
 endforeach()
