@@ -488,11 +488,10 @@ namespace ts
     }
 
     template <typename T>
-    void Tensor<T>::view(const std::vector<int> &shape)
+    Tensor<T> Tensor<T>::view(const std::vector<int> &shape)
     {
         Tensor<T> reshaped_tensor = reshape(shape);
-        // output
-        std::cout << reshaped_tensor << std::endl;
+        return reshaped_tensor;
     }
 
 
