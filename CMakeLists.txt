@@ -4,6 +4,12 @@ project(Tensor)
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(CUDA)
+
+set(CMAKE_NVCC_FlAGS -gencode arch = compute_20, code = sm_20;-G;-g)
+# 配置 CUDA 相关设置
+enable_language(CUDA)
+
 # 包含头文件目录
 include_directories(Include)
 message("Start processing...")
@@ -28,7 +34,7 @@ find_package(OpenMP)
 foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
     # 输出与当前测试文件相关的源文件
     get_filename_component(BENCHMARK_NAME ${BENCHMARK_FILE} NAME_WE)
-    add_executable(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
-    target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
+    CUDA_ADD_EXECUTABLE(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
+    target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX cuda)
     target_compile_options(${BENCHMARK_NAME} PRIVATE -O3 -lpthread)
 endforeach()

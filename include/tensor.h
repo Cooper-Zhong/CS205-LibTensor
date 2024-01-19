@@ -168,7 +168,8 @@ namespace ts
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
         template <typename Y>
-        friend Tensor<Y> add_cu(const Tensor<Y> &t1, const Tensor<Y> &t2);
+        friend Tensor<Y> add_cu_f(const Tensor<Y> &t1, const Tensor<Y> &t2);
+        Tensor<T> add_cu(const Tensor<T> &t1);
 
         Tensor<T> sub(const Tensor<T> &t);
         Tensor<T> sub(T value);
@@ -204,6 +205,7 @@ namespace ts
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, Y value);
+
 
         // serialization
         void serialize(std::string filename);
