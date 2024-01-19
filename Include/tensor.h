@@ -105,7 +105,7 @@ namespace ts
         Tensor<T> view(const std::vector<int> &shape);
 
         template <typename T1>
-        friend std::ostream &operator<<(std::ostream &o, Tensor<T1> &t);
+        friend std::ostream &operator<<(std::ostream &o, const Tensor<T1> &t);
 
         /**
          * @brief 重载运算符
@@ -526,7 +526,7 @@ namespace ts
     }
 
     template <typename T>
-    std::ostream &operator<<(std::ostream &o, Tensor<T> &t)
+    std::ostream &operator<<(std::ostream &o, const Tensor<T> &t)
     {
         // o << "Data pointer: " << t.get_data() << std::endl;
         // o << "Data length: " << t.get_data_length() << std::endl;
