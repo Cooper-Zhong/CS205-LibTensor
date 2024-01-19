@@ -14,7 +14,7 @@ namespace ts
 
     template<typename T>
     __global__ void ein_cu_kernal(T* result, const T* data1, const T* data2, int t1_height, int t1_width, int t2_width) {
-        size_t idx = blockIdx.x * blockDim.x + threaIdx.x;
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         if (idx >= t1_height*t2_width)
         {
             return;
@@ -90,7 +90,8 @@ namespace ts
 
     template<typename T>
     Tensor<T> Tensor<T>::cu_ein(Tensor<T>& t){
-        Tensor<T> result = Tensor<T>(shape);
+        std::vector<int> shap = {shape[0],t.shape[1]};
+        Tensor<T> result = Tensor<T>(shap);
         if(gpu_t == nullptr){
             gpu();
         }
@@ -113,6 +114,7 @@ namespace ts
     }
 
     template ts::Tensor<double> ts::Tensor<double>::cu_add(ts::Tensor<double>&);
+    template ts::Tensor<double> ts::Tensor<double>::cu_ein(ts::Tensor<double>&);
 
     template ts::Tensor<int> ts::Tensor<int>::add_cu(ts::Tensor<int> const&);
     template ts::Tensor<float> ts::Tensor<float>::add_cu(ts::Tensor<float> const&);
