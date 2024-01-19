@@ -50,7 +50,7 @@ namespace ts
     
     template<typename T>
     void dataToDevice(T* dev, const T* hos, int length){
-        assert(cudaSuccess==cudaMalloc((void*)&dev,length*sizeof(T)));
+        assert(cudaSuccess==cudaMalloc((void**)&dev,length*sizeof(T)));
         assert(cudaSuccess==cudaMemcpy(dev,hos,length*sizeof(T),cudaMemcpyHostToDevice));
     }
 
@@ -64,7 +64,7 @@ namespace ts
     template<typename T>
     void add_perf(T* result, const T* data1, const T* data2, int length) {
         int threadsPerBlock = 1024;
-        int numBlocks = (t1.data_length + threadsPerBlock-1) / threadsPerBlock;
+        int numBlocks = (length + threadsPerBlock-1) / threadsPerBlock;
         add_cu_kernal<<<numBlocks,threadsPerBlock>>>(result, data1, data2, length);
         cudaDeviceSynchronize();
     }
