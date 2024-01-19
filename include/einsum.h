@@ -1,4 +1,6 @@
-#pragma once
+#ifndef EINSUM_H_
+#define EINSUM_H_
+
 #include "tensor.h"
 
 namespace ts
@@ -255,3 +257,5 @@ namespace ts
         return result;
     }
 } // namespace ts
+
+#endif

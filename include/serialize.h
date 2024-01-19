@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERIALIZE_H
+#define SERIALIZE_H
 #include "tensor.h"
 #include <fstream>
 
@@ -41,3 +42,5 @@ namespace ts
         return tensor;
     }
 }
+
+#endif

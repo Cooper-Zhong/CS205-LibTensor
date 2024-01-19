@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef TEST_H_
+#define TEST_H_
 #include <vector>
 #include <iostream>
 #include "tensor.h"
@@ -107,3 +107,4 @@ ts::Tensor<double> create_test_tensor(vector<int> shape, bool output_progress = 
 
     return t3;
 }
+#endif

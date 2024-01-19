@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TRANSFORM_H_
+#define TRANSFORM_H_
 
 #include "tensor.h"
 
@@ -326,7 +327,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::squeeze()
+    Tensor<T> Tensor<T>::squeeze() const
     {
         // Check if the tensor is a vector
         if (ndim == 1)
@@ -355,9 +356,9 @@ namespace ts
         // Calculate the new stride
         std::vector<int> new_stride;
         int data_l = data_length;
-        for (int i = 0; i < ndim; i++)
+        for (int i = 0; i < new_tensor.ndim; i++)
         {
-            data_l /= shape[i];
+            data_l /= new_shape[i];
             new_stride.push_back(data_l);
         }
         new_tensor.stride = new_stride;
@@ -497,3 +498,4 @@ namespace ts
 
 
 } // namespace ts
+#endif
