@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # 查找CUDA并设置相关变量
 find_package(CUDA)
-set(CUDA_FILES "Src/*.cu")
+file(GLOB CUDA_FILES "Src/*.cu")  # 新增 CUDA 文件的查找
 
 # 配置 CUDA 相关设置
 if(CUDA_FOUND)
@@ -38,9 +38,19 @@ endforeach()
 
 
 
-# Benchmark 文件
+# Benchmark and CUDA Test 文件
 if(CUDA_FOUND)
-    file(GLOB BENCHMARK_FILES "Benchmark/*.cpp")
+    file(GLOB CUDATEST_FILES "Test/*.cu")
+    foreach(CUDATEST_FILE ${CUDATEST_FILES})
+        # 输出与当前测试文件相关的源文件
+        get_filename_component(CUDATEST_NAME ${CUDATEST_FILE} NAME_WE)
+        add_executable(${CUDATEST_NAME} ${CUDATEST_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
+        target_link_libraries(${CUDATEST_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
+        target_compile_options(${CUDATEST_NAME} PRIVATE -O3 -lpthread)
+        target_link_libraries(${CUDATEST_NAME} ${CUDA_LIBRARIES})
+    endforeach()
+
+    file(GLOB BENCHMARK_FILES "Benchmark/*.cu")
     find_package(benchmark REQUIRED)
     find_package(OpenMP)
     foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
