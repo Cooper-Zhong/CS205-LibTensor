@@ -23,7 +23,6 @@ message("Start processing...")
 # 查找并包含所有源文件
 file(GLOB SRC_FILES "Src/*.cpp")
 file(GLOB TEST_FILES "Test/*.cpp")
-file(GLOB BENCHMARK_FILES "Benchmark/*.cpp")
 
 # 添加可执行文件，每个测试文件都对应一个可执行文件
 foreach(TEST_FILE ${TEST_FILES})
@@ -37,11 +36,13 @@ foreach(TEST_FILE ${TEST_FILES})
     endif()
 endforeach()
 
-find_package(benchmark REQUIRED)
-find_package(OpenMP)
+
 
 # Benchmark 文件
 if(CUDA_FOUND)
+    file(GLOB BENCHMARK_FILES "Benchmark/*.cpp")
+    find_package(benchmark REQUIRED)
+    find_package(OpenMP)
     foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
         # 输出与当前测试文件相关的源文件
         get_filename_component(BENCHMARK_NAME ${BENCHMARK_FILE} NAME_WE)
