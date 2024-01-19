@@ -160,32 +160,48 @@ namespace ts
             throw std::invalid_argument("Dimension out of range.");
         }
         // 计算结果张量的形状
-        std::vector<int> result_shape(ndim - 1);
-        for (int i = 0, j = 0; i < shape.size(); ++i)
+        std::vector<int> result_shape(ndim);
+        for (int j = 0; j < shape.size(); ++j)
         {
-            if (i != dim)
+            if (j == dim)
             {
-                result_shape[j++] = shape[i];
+                result_shape[j] = 1; // 要reduce的维度
+            }
+            else
+            {
+                result_shape[j] = shape[j];
             }
         }
         Tensor result = Tensor<T>(result_shape);
-        for (int i = 0; i < result.data_length; ++i)
+        std::vector<int> index = std::vector<int>(this->ndim, 0);
+        int top = this->ndim - 1;
+        T *data_this = this->data.get() + this->offset;
+        T *data_result = result.data.get() + result.offset;
+        T *current_this = data_this;
+        T *current_result = data_result;
+        while (index[0] < this->shape[0])
         {
-            for (int j = 0; j < stride[dim]; ++j)
+            std::vector<int> result_index = index;
+            result_index[dim] = 0;
+            result.enisum_indexing(result_index) = this->enisum_indexing(index) + result.enisum_indexing(result_index);
+            index[top]++;
+            while (index[top] == this->shape[top])
             {
-                T sum = 0;
-                for (int k = 0; k < shape[dim]; ++k)
+                top--;
+                if (top < 0)
                 {
-                    if (dim == 0)
-                    {
-                        sum += data[k * stride[dim] + j + offset];
-                    }
-                    else
-                    {
-                        sum += data[i * stride[dim - 1] + k * stride[dim] + j + offset];
-                    }
+                    break;
                 }
-                result.data[i * stride[dim] + j] = sum;
+                index[top]++;
+            }
+            if (top < 0)
+            {
+                break;
+            }
+            while (top < this->ndim - 1)
+            {
+                top++;
+                index[top] = 0;
             }
         }
         return result;
@@ -210,44 +226,60 @@ namespace ts
             throw std::invalid_argument("Dimension out of range.");
         }
         // 计算结果张量的形状
-        std::vector<int> result_shape(ndim - 1);
-        for (int i = 0, j = 0; i < shape.size(); ++i)
+        std::vector<int> result_shape(ndim);
+        for (int j = 0; j < shape.size(); ++j)
         {
-            if (i != dim)
+            if (j == dim)
             {
-                result_shape[j++] = shape[i];
+                result_shape[j] = 1; // 要reduce的维度
+            }
+            else
+            {
+                result_shape[j] = shape[j];
             }
         }
         Tensor result = Tensor<T>(result_shape);
         for (int i = 0; i < result.data_length; ++i)
         {
-            for (int j = 0; j < stride[dim]; ++j)
+            result.data[i] = std::numeric_limits<T>::min();
+        }
+        std::vector<int> index = std::vector<int>(this->ndim, 0);
+        int top = this->ndim - 1;
+        T *data_this = this->data.get() + this->offset;
+        T *data_result = result.data.get() + result.offset;
+        T *current_this = data_this;
+        T *current_result = data_result;
+
+        while (index[0] < this->shape[0])
+        {
+            std::vector<int> result_index = index;
+            result_index[dim] = 0;
+            result.enisum_indexing(result_index) = std::max(this->enisum_indexing(index), result.enisum_indexing(result_index));
+            index[top]++;
+            while (index[top] == this->shape[top])
             {
-                T max = std::numeric_limits<T>::min();
-                for (int k = 0; k < shape[dim]; ++k)
+                top--;
+                if (top < 0)
                 {
-                    if (dim == 0)
-                    {
-                        if (data[k * stride[dim] + j + offset] > max)
-                        {
-                            max = data[k * stride[dim] + j + offset];
-                        }
-                    }
-                    else
-                    {
-                        if (data[i * stride[dim - 1] + k * stride[dim] + j + offset] > max)
-                        {
-                            max = data[i * stride[dim - 1] + k * stride[dim] + j + offset];
-                        }
-                    }
+                    break;
                 }
-                result.data[i * stride[dim] + j] = max;
+                index[top]++;
+            }
+            if (top < 0)
+            {
+                break;
+            }
+            while (top < this->ndim - 1)
+            {
+                top++;
+                index[top] = 0;
             }
         }
         return result;
     }
 
-    template <typename T>
+
+     template <typename T>
     Tensor<T> Tensor<T>::min(const int &dim) const
     {
         if (dim < 0 || dim >= ndim)
@@ -255,38 +287,56 @@ namespace ts
             throw std::invalid_argument("Dimension out of range.");
         }
         // 计算结果张量的形状
-        std::vector<int> result_shape(ndim - 1);
-        for (int i = 0, j = 0; i < shape.size(); ++i)
+        std::vector<int> result_shape(ndim);
+        for (int j = 0; j < shape.size(); ++j)
         {
-            if (i != dim)
+            if (j == dim)
             {
-                result_shape[j++] = shape[i];
+                result_shape[j] = 1; // 要reduce的维度
+            }
+            else
+            {
+                result_shape[j] = shape[j];
             }
         }
         Tensor result = Tensor<T>(result_shape);
         for (int i = 0; i < result.data_length; ++i)
         {
-            for (int j = 0; j < stride[dim]; ++j)
+            result.data[i] = std::numeric_limits<T>::max();
+        }
+        std::vector<int> index = std::vector<int>(this->ndim, 0);
+        int top = this->ndim - 1;
+        T *data_this = this->data.get() + this->offset;
+        T *data_result = result.data.get() + result.offset;
+        T *current_this = data_this;
+        T *current_result = data_result;
+
+        while (index[0] < this->shape[0])
+        {
+
+            std::vector<int> result_index = index;
+            result_index[dim] = 0;
+            
+            result.enisum_indexing(result_index) = std::min(this->enisum_indexing(index), result.enisum_indexing(result_index));
+
+            index[top]++;
+            while (index[top] == this->shape[top])
             {
-                T min = std::numeric_limits<T>::max();
-                for (int k = 0; k < shape[dim]; ++k)
-                { // 对dim维度上的元素求和
-                    if (dim == 0)
-                    {
-                        if (data[k * stride[dim] + j + offset] < min)
-                        {
-                            min = data[k * stride[dim] + j + offset];
-                        }
-                    }
-                    else
-                    {
-                        if (data[i * stride[dim - 1] + k * stride[dim] + j + offset] < min)
-                        {
-                            min = data[i * stride[dim - 1] + k * stride[dim] + j + offset];
-                        }
-                    }
+                top--;
+                if (top < 0)
+                {
+                    break;
                 }
-                result.data[i * stride[dim] + j] = min;
+                index[top]++;
+            }
+            if (top < 0)
+            {
+                break;
+            }
+            while (top < this->ndim - 1)
+            {
+                top++;
+                index[top] = 0;
             }
         }
         return result;
