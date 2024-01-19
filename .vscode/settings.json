@@ -66,6 +66,9 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "unordered_map": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__undef_macros": "cpp",
+        "functional": "cpp",
+        "memory_resource": "cpp"
     }
 }
