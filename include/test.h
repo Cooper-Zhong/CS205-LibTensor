@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 ts::Tensor<double> create_test_tensor(vector<int> shape, bool output_progress = false, bool output_final = true)
 {
     int padding = 1;
@@ -15,7 +14,8 @@ ts::Tensor<double> create_test_tensor(vector<int> shape, bool output_progress = 
     int data_length = 1;
 
     vector<int> padded_shape(shape.size());
-    for (int i = 0; i < shape.size(); i++){
+    for (int i = 0; i < shape.size(); i++)
+    {
         padded_shape[i] = shape[i] + padding * 2;
         data_length *= padded_shape[i];
     }
@@ -79,27 +79,27 @@ ts::Tensor<double> create_test_tensor(vector<int> shape, bool output_progress = 
         cout << "Sliced Tensor: " << endl
              << t3 << endl;
     }
-/* 
-    // randomly permute the axes again
-    iota(axes.begin(), axes.end(), 0);
-    random_shuffle(axes.begin(), axes.end());
+    /*
+        // randomly permute the axes again
+        iota(axes.begin(), axes.end(), 0);
+        random_shuffle(axes.begin(), axes.end());
 
-    if (output_progress)
-    {
-        cout << "Randomly permuted axes again: " << endl;
-        for (auto i : axes)
-            cout << i << " ";
-        cout << endl;
-    }
+        if (output_progress)
+        {
+            cout << "Randomly permuted axes again: " << endl;
+            for (auto i : axes)
+                cout << i << " ";
+            cout << endl;
+        }
 
-    // randomly permute the tensor
-    ts::Tensor<double> t4 = t3.permute(axes);
+        // randomly permute the tensor
+        ts::Tensor<double> t4 = t3.permute(axes);
 
-    if (output_progress)
-    {
-        cout << "Randomly permuted Tensor again: " << endl
-             << t4 << endl;
-    } */
+        if (output_progress)
+        {
+            cout << "Randomly permuted Tensor again: " << endl
+                 << t4 << endl;
+        } */
 
     if (output_final)
         cout << "Final Tensor: " << endl
