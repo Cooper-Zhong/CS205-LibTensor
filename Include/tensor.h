@@ -254,6 +254,13 @@ namespace ts
         Tensor<T> cu_div(Tensor<T>& t);
         Tensor<T> cu_ein(Tensor<T>& t);
 
+        Tensor<bool> cu_eq(Tensor<T>& t);
+        Tensor<bool> cu_ne(Tensor<T>& t);
+        Tensor<bool> cu_gt(Tensor<T>& t);
+        Tensor<bool> cu_ge(Tensor<T>& t);
+        Tensor<bool> cu_lt(Tensor<T>& t);
+        Tensor<bool> cu_le(Tensor<T>& t);
+
         };
 
     // Default Constructor
