@@ -296,7 +296,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape) const
+    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape)
     {
         // check contiguous of the tensor
         if (!is_contiguous())
@@ -365,7 +365,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::unsqueeze(int new_dim) const
+    Tensor<T> Tensor<T>::unsqueeze(int new_dim)
     {
         // Check if the dimension is valid
         if (new_dim < 0 || new_dim < ndim)
@@ -419,7 +419,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::tile(std::vector<int> dims) const
+    Tensor<T> Tensor<T>::tile(std::vector<int> dims)
     {
         // Check if the dimensions are valid
         for (int i = 0; i < ndim; i++)
@@ -494,6 +494,7 @@ namespace ts
         return reshaped_tensor;
     }
 
+    
     template <typename T>
     T& Tensor<T>::at(const std::vector<int> &indices) const{
         // Check if the number of indices is equal to the number of dimensions

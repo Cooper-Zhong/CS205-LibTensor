@@ -38,8 +38,8 @@ void test_pointwise()
     cout << "t1 * t2:\n" << t5 << endl;
     ts::Tensor<double> t6 = t1 / t2;
     cout << "t1 / t2:\n" << t6 << endl;
-    ts::Tensor<double> t7 = t1.log(t2);
-    cout << "t1.log(t2):\n" << t7 << endl;
+    ts::Tensor<double> t7 = t1.log();
+    cout << "t1.log():\n" << t7 << endl;
 ;
 }
 

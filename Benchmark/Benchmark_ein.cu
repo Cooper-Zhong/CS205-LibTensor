@@ -37,6 +37,7 @@ static void BM_cu_ein(benchmark::State &state)
     a.gpu_free();
     b.gpu_free();
 }
+
 BENCHMARK(BM_cu_ein)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
 
 BENCHMARK_MAIN();

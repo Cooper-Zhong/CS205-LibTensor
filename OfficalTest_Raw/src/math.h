@@ -436,7 +436,7 @@ namespace ts
         Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i] = t1.data[i] + t2.data[i];
+            result.data[i] = t1.data[i] - t2.data[i];
         }
         return result;
     }

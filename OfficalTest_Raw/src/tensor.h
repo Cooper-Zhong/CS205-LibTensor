@@ -364,10 +364,19 @@ namespace ts
         Tensor<T> eye_tensor(_shape);
 
         // Check if the shape is square
-        if (_shape.size() < 2 ||
-            !std::equal(_shape.begin(), _shape.end() - 1, _shape.begin() + 1, std::equal_to<int>()))
+        // if (_shape.size() < 2 ||
+        //     !std::equal(_shape.begin(), _shape.end() - 1, _shape.begin() + 1, std::equal_to<int>()))
+        // {
+        //     throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+        // }
+
+        int min_dim = __INT32_MAX__;
+        for (size_t i = 0; i < _shape.size(); i++)
         {
-            throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+            if (min_dim>_shape[i])
+            {
+                min_dim = _shape[i];
+            }
         }
 
         // Initialize as an identity matrix
@@ -375,7 +384,7 @@ namespace ts
         T *current = data;
         auto stride = eye_tensor.get_stride();
 
-        for (int i = 0; i < _shape[0]; i++)
+        for (int i = 0; i < min_dim; i++)
         {
             current = data;
             for (int j = 0; j < _shape.size(); j++)
