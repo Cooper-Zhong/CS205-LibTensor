@@ -29,8 +29,6 @@ static void BM_comparison(benchmark::State &state)
         benchmark::ClobberMemory();
     }
 }
-BENCHMARK(BM_comparison)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
-
 
 static void BM_cu_comparison(benchmark::State &state)
 {
@@ -60,7 +58,6 @@ static void BM_cu_comparison(benchmark::State &state)
     b.gpu_free();
 }
 
-BENCHMARK(BM_comparison)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
 
 static void BM_omp_comparison(benchmark::State &state)
 {
@@ -88,6 +85,8 @@ static void BM_omp_comparison(benchmark::State &state)
     }
 }
 
+BENCHMARK(BM_cu_comparison)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
+BENCHMARK(BM_comparison)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
 BENCHMARK(BM_omp_comparison)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
 
 BENCHMARK_MAIN();

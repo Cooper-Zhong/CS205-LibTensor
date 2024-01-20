@@ -50,7 +50,7 @@ if(CUDA_FOUND)
         target_link_libraries(${CUDATEST_NAME} ${CUDA_LIBRARIES})
     endforeach()
 
-    file(GLOB BENCHMARK_FILES "Benchmark/*.cu")
+    file(GLOB BENCHMARK_FILES "Benchmark/*.cpp")
     find_package(benchmark REQUIRED)
     find_package(OpenMP)
     foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
@@ -59,6 +59,18 @@ if(CUDA_FOUND)
         add_executable(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
         target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
         target_compile_options(${BENCHMARK_NAME} PRIVATE -lpthread)
+        target_link_libraries(${BENCHMARK_NAME} ${CUDA_LIBRARIES})
+    endforeach()
+
+    file(GLOB BENCHMARK_FILES "BenchmarkO3/*.cpp")
+    find_package(benchmark REQUIRED)
+    find_package(OpenMP)
+    foreach(BENCHMARK_FILE ${BENCHMARK_FILES})
+        # 输出与当前测试文件相关的源文件
+        get_filename_component(BENCHMARK_NAME ${BENCHMARK_FILE} NAME_WE)
+        add_executable(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
+        target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
+        target_compile_options(${BENCHMARK_NAME} PRIVATE -O3 -lpthread)
         target_link_libraries(${BENCHMARK_NAME} ${CUDA_LIBRARIES})
     endforeach()
 endif()

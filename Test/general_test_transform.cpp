@@ -27,7 +27,7 @@ void general_test_transform(){
     cout << "t1 data pointer: " << t1.get_data() << endl;
 
     cout << "--------------- Mutating Test ---------------" << endl;
-    t1[]
+    // t1[]
     cout << "t1[1:3,2:4]:\n" << test << endl;
     cout << "t1[1:3,2:4] data pointer: " << test.get_data() << endl;
     cout << "t1 data pointer: " << t1.get_data() << endl;

@@ -2,7 +2,7 @@
 #include "tensor.h"
 #include "test.h"
 
-static void BM_ein(benchmark::State &state)
+static void BM_matrix_product(benchmark::State &state)
 {
     int N = state.range(0);
     state.SetComplexityN(state.range(0));
@@ -17,9 +17,9 @@ static void BM_ein(benchmark::State &state)
         benchmark::ClobberMemory();
     }
 }
-BENCHMARK(BM_ein)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
+BENCHMARK(BM_matrix_product)->DenseRange(8, 256, 8)->Complexity(benchmark::oAuto);
 
-static void BM_cu_ein(benchmark::State &state)
+static void BM_cu_matrix_product(benchmark::State &state)
 {
     int N = state.range(0);
     state.SetComplexityN(state.range(0));
@@ -38,6 +38,6 @@ static void BM_cu_ein(benchmark::State &state)
     b.gpu_free();
 }
 
-BENCHMARK(BM_cu_ein)->DenseRange(16, 512, 16)->Complexity(benchmark::oAuto);
+BENCHMARK(BM_cu_matrix_product)->DenseRange(16, 1024, 16)->Complexity(benchmark::oAuto);
 
 BENCHMARK_MAIN();

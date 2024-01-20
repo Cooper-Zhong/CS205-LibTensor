@@ -27,6 +27,18 @@ namespace xtada {
         return a == b;
     }
 
+    template<>
+    bool equals(const double &a, const double &b);
+
+    template<>
+    bool equals(const double &a, const float &b);
+
+    template<>
+    bool equals(const float &a, const double &b);
+
+    template<>
+    bool equals(const float &a, const float &b);
+    
     template<typename T>
     bool equiv(const xt::xarray<T> &expected, const ts::Tensor<T> &actual) {
         auto shape = expected.shape();
