@@ -30,7 +30,7 @@ void test_creation()
     cout << t4 << endl;
 
     //4.a given shape and data type, and initialize it to a specific pattern
-    ts::Tensor<double> t5 = ts::Tensor<double>::eye_tensor({4,4});
+    ts::Tensor<double> t5 = ts::Tensor<double>::eye_tensor({3,4});
     cout << t5 << endl;
 
 }

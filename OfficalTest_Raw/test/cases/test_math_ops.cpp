@@ -47,6 +47,7 @@ TEST_BIN_OP(Add, pointwise_add, xarr1 + xarr2)
 TEST_BIN_OP(Sub, pointwise_sub, xarr1 - xarr2)
 TEST_BIN_OP(Mul, pointwise_mul, xarr1 * xarr2)
 TEST_BIN_OP(Div, pointwise_div, xarr1 / xarr2)
+
 TEST_BIN_OP(Log, pointwise_log, xt::log(xarr1))
 
 TEST_BIN_OP(ComparisionEq, eq, xt::equal(xarr1, xarr2))

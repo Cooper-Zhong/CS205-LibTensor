@@ -13,7 +13,7 @@ namespace ts
      */
 
     template <typename T>
-    void Tensor<T>::checkShape(const Tensor<T> &t1, const Tensor<T> &t2)
+    void Tensor<T>::checkShape(const Tensor<T> &t1, const Tensor<T> &t2) const
     {
         if (t1.get_type() != t2.get_type())
         {
@@ -210,7 +210,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze(dim);
+        return result.squeeze();
     }
 
     template <typename T>
@@ -281,7 +281,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze(dim);
+        return result.squeeze();
     }
 
 
@@ -345,29 +345,29 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze(dim);
+        return result.squeeze();
     }
 
     template <typename U>
-    Tensor<U> sum(const Tensor<U> &t, const int &dim)
+    Tensor<U> sum(const Tensor<U> &t, const int &dim) const
     {
         return t.sum(dim);
     }
 
     template <typename U>
-    Tensor<U> mean(const Tensor<U> &t, const int &dim)
+    Tensor<U> mean(const Tensor<U> &t, const int &dim) const
     {
         return t.mean(dim);
     }
 
     template <typename U>
-    Tensor<U> max(const Tensor<U> &t, const int &dim)
+    Tensor<U> max(const Tensor<U> &t, const int &dim) const
     {
         return t.max(dim);
     }
 
     template <typename U>
-    Tensor<U> min(const Tensor<U> &t, const int &dim)
+    Tensor<U> min(const Tensor<U> &t, const int &dim) const
     {
         return t.min(dim);
     }
@@ -417,12 +417,12 @@ namespace ts
         return this->add(value);
     }
     template <typename Y>
-    Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.add(t2);
     }
     template <typename Y>
-    Tensor<Y> add(const Tensor<Y> &t1, Y value)
+    Tensor<Y> add(const Tensor<Y> &t1, Y value) const
     {
         return t1.add(value);
     }
@@ -436,7 +436,7 @@ namespace ts
         Tensor<T> result = Tensor(this->shape);
         for (int i = 0; i < result.data_length; i++)
         {
-            result.data[i] = t1.data[i] - t2.data[i];
+            result.data[i] = t1.data[i] + t2.data[i];
         }
         return result;
     }
@@ -462,12 +462,12 @@ namespace ts
         return this->sub(value);
     }
     template <typename Y>
-    Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.sub(t2);
     }
     template <typename Y>
-    Tensor<Y> sub(const Tensor<Y> &t1, Y value)
+    Tensor<Y> sub(const Tensor<Y> &t1, Y value) const
     {
         return t1.sub(value);
     }
@@ -507,12 +507,12 @@ namespace ts
         return this->mul(value);
     }
     template <typename Y>
-    Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.mul(t2);
     }
     template <typename Y>
-    Tensor<Y> mul(const Tensor<Y> &t1, Y value)
+    Tensor<Y> mul(const Tensor<Y> &t1, Y value) const
     {
         return t1.mul(value);
     }
@@ -548,16 +548,16 @@ namespace ts
     }
     template <typename T>
     Tensor<T> Tensor<T>::operator/(T value) const
-    {
+    { 
         return this->div(value);
     }
     template <typename Y>
-    Tensor<Y> div(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> div(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.div(t2);
     }
     template <typename Y>
-    Tensor<Y> div(const Tensor<Y> &t1, Y value)
+    Tensor<Y> div(const Tensor<Y> &t1, Y value) const
     {
         return t1.div(value);
     }
@@ -598,12 +598,12 @@ namespace ts
         return result;
     }
     template <typename Y>
-    Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.log(t2);
     }
     template <typename Y>
-    Tensor<Y> log(const Tensor<Y> &t1, Y value)
+    Tensor<Y> log(const Tensor<Y> &t1, Y value) const
     {
         return t1.log(value);
     }

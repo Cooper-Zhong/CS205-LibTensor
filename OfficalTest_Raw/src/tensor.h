@@ -179,9 +179,7 @@ namespace ts
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
-        template <typename Y>
-        friend Tensor<Y> add_cu_f(const Tensor<Y> &t1, const Tensor<Y> &t2);
-        Tensor<T> add_cu(const Tensor<T> &t1);
+    
 
         Tensor<T> sub(const Tensor<T> &t) const;
         Tensor<T> sub(T value) const;
@@ -242,6 +240,9 @@ namespace ts
         void gpu_free();
         T* get_gpu_t();
         Tensor<T> cu_add(Tensor<T>& t);
+        Tensor<T> cu_sub(Tensor<T>& t);
+        Tensor<T> cu_mul(Tensor<T>& t);
+        Tensor<T> cu_div(Tensor<T>& t);
         Tensor<T> cu_ein(Tensor<T>& t);
         };
 
@@ -365,10 +366,19 @@ namespace ts
         Tensor<T> eye_tensor(_shape);
 
         // Check if the shape is square
-        if (_shape.size() < 2 ||
-            !std::equal(_shape.begin(), _shape.end() - 1, _shape.begin() + 1, std::equal_to<int>()))
+        // if (_shape.size() < 2 ||
+        //     !std::equal(_shape.begin(), _shape.end() - 1, _shape.begin() + 1, std::equal_to<int>()))
+        // {
+        //     throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+        // }
+
+        int min_dim = __INT32_MAX__;
+        for (size_t i = 0; i < _shape.size(); i++)
         {
-            throw std::invalid_argument("eye_tensor is only supported for square tensors.");
+            if (min_dim>_shape[i])
+            {
+                min_dim = _shape[i];
+            }
         }
 
         // Initialize as an identity matrix
@@ -376,7 +386,7 @@ namespace ts
         T *current = data;
         auto stride = eye_tensor.get_stride();
 
-        for (int i = 0; i < _shape[0]; i++)
+        for (int i = 0; i < min_dim; i++)
         {
             current = data;
             for (int j = 0; j < _shape.size(); j++)
