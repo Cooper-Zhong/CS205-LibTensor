@@ -5,7 +5,7 @@
 
 namespace ts
 {
-        template <typename T>
+    template <typename T>
     Tensor<T> Tensor<T>::slicing(const std::vector<std::vector<int>> &indices) const
     {
         // Check if the number of indices is equal to the number of dimensions
@@ -290,9 +290,7 @@ namespace ts
         Tensor<T> new_tensor = Tensor<T>(shape);
 
         // Copy data element by element
-        new_tensor = *this;
-
-        new_tensor = *this;
+        new_tensor.deepcopy_from(*this);
 
         return new_tensor;
     }
@@ -436,10 +434,12 @@ namespace ts
         if (dims.size() < ndim)
         {
             dims.insert(dims.begin(), ndim - dims.size(), 1);
-}else if(dims.size() > ndim){
+        }
+        else if (dims.size() > ndim)
+        {
             tensor = this->unsqueeze(dims.size());
         }
-        
+
         // Calculate the new shape
         std::vector<int> new_shape;
         for (int i = 0; i < ndim; i++)
@@ -461,13 +461,13 @@ namespace ts
             {
                 slicing_indices.push_back({index[i] * shape[i], (index[i] + 1) * shape[i]});
             }
-            new_tensor(slicing_indices) = tensor;
+            new_tensor(slicing_indices).deepcopy_from(tensor);
 
             index[top]++;
             while (index[top] == dims[top])
             {
                 top--;
-                if (top<0)
+                if (top < 0)
                 {
                     break;
                 }
@@ -480,7 +480,7 @@ namespace ts
             while (top < dims.size() - 1)
             {
                 top++;
-                index[top]=0;
+                index[top] = 0;
             }
         }
 
@@ -493,8 +493,6 @@ namespace ts
         Tensor<T> reshaped_tensor = reshape(shape);
         return reshaped_tensor;
     }
-
-
 
 } // namespace ts
 #endif

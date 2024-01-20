@@ -110,7 +110,7 @@ namespace ts
         /**
          * @brief 重载运算符
          */
-        Tensor<T> &operator=(const Tensor<T> &t);    // copy
+        Tensor<T>& deepcopy_from(const Tensor<T> &t);    // deepcopy
         Tensor<bool> operator==(const Tensor<T> &t); // 等于
         Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
         Tensor<bool> operator>(const Tensor<T> &t);  // 大于
@@ -566,9 +566,8 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> &Tensor<T>::operator=(const Tensor<T> &t)
+    Tensor<T> &Tensor<T>::deepcopy_from(const Tensor<T> &t)
     {
-
         if (this->shape.size() != t.shape.size() ||
             !std::equal(this->shape.begin(), this->shape.end(), t.shape.begin(), std::equal_to<int>()))
         {
