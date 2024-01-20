@@ -13,7 +13,7 @@ namespace ts
      */
 
     template <typename T>
-    void Tensor<T>::checkShape(const Tensor<T> &t1, const Tensor<T> &t2)
+    void Tensor<T>::checkShape(const Tensor<T> &t1, const Tensor<T> &t2) const
     {
         if (t1.get_type() != t2.get_type())
         {
@@ -33,7 +33,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator==(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator==(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -48,7 +48,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator!=(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator!=(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -63,7 +63,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator>(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator>(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -78,7 +78,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator<(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator<(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -93,7 +93,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator>=(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator>=(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -108,7 +108,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::operator<=(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::operator<=(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
@@ -123,37 +123,37 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::eq(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::eq(const Tensor<T> &t) const
     {
         return *this == t;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::ne(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::ne(const Tensor<T> &t) const
     {
         return *this != t;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::gt(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::gt(const Tensor<T> &t) const
     {
         return *this > t;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::lt(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::lt(const Tensor<T> &t) const
     {
         return *this < t;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::ge(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::ge(const Tensor<T> &t) const
     {
         return *this >= t;
     }
 
     template <typename T>
-    Tensor<bool> Tensor<T>::le(const Tensor<T> &t)
+    Tensor<bool> Tensor<T>::le(const Tensor<T> &t) const
     {
         return *this <= t;
     }
@@ -349,25 +349,25 @@ namespace ts
     }
 
     template <typename U>
-    Tensor<U> sum(const Tensor<U> &t, const int &dim)
+    Tensor<U> sum(const Tensor<U> &t, const int &dim) const
     {
         return t.sum(dim);
     }
 
     template <typename U>
-    Tensor<U> mean(const Tensor<U> &t, const int &dim)
+    Tensor<U> mean(const Tensor<U> &t, const int &dim) const
     {
         return t.mean(dim);
     }
 
     template <typename U>
-    Tensor<U> max(const Tensor<U> &t, const int &dim)
+    Tensor<U> max(const Tensor<U> &t, const int &dim) const
     {
         return t.max(dim);
     }
 
     template <typename U>
-    Tensor<U> min(const Tensor<U> &t, const int &dim)
+    Tensor<U> min(const Tensor<U> &t, const int &dim) const
     {
         return t.min(dim);
     }
@@ -383,7 +383,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::add(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::add(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> t1 = this->contiguous();
@@ -396,7 +396,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::add(T value)
+    Tensor<T> Tensor<T>::add(T value) const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -407,28 +407,28 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator+(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::operator+(const Tensor<T> &t) const
     {
         return this->add(t);
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator+(T value)
+    Tensor<T> Tensor<T>::operator+(T value) const
     {
         return this->add(value);
     }
     template <typename Y>
-    Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.add(t2);
     }
     template <typename Y>
-    Tensor<Y> add(const Tensor<Y> &t1, Y value)
+    Tensor<Y> add(const Tensor<Y> &t1, Y value) const
     {
         return t1.add(value);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::sub(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::sub(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> t1 = this->contiguous();
@@ -441,7 +441,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::sub(T value)
+    Tensor<T> Tensor<T>::sub(T value) const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -452,28 +452,28 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator-(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::operator-(const Tensor<T> &t) const
     {
         return this->sub(t);
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator-(T value)
+    Tensor<T> Tensor<T>::operator-(T value) const
     {
         return this->sub(value);
     }
     template <typename Y>
-    Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.sub(t2);
     }
     template <typename Y>
-    Tensor<Y> sub(const Tensor<Y> &t1, Y value)
+    Tensor<Y> sub(const Tensor<Y> &t1, Y value) const
     {
         return t1.sub(value);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::mul(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::mul(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> t1 = this->contiguous();
@@ -486,7 +486,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::mul(T value)
+    Tensor<T> Tensor<T>::mul(T value) const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -497,28 +497,28 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator*(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::operator*(const Tensor<T> &t) const
     {
         return this->mul(t);
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator*(T value)
+    Tensor<T> Tensor<T>::operator*(T value) const
     {
         return this->mul(value);
     }
     template <typename Y>
-    Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.mul(t2);
     }
     template <typename Y>
-    Tensor<Y> mul(const Tensor<Y> &t1, Y value)
+    Tensor<Y> mul(const Tensor<Y> &t1, Y value) const
     {
         return t1.mul(value);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::div(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::div(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> t1 = this->contiguous();
@@ -531,7 +531,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::div(T value)
+    Tensor<T> Tensor<T>::div(T value) const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -542,28 +542,28 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator/(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::operator/(const Tensor<T> &t) const
     {
         return this->div(t);
     }
     template <typename T>
-    Tensor<T> Tensor<T>::operator/(T value)
-    {
+    Tensor<T> Tensor<T>::operator/(T value) const
+    { 
         return this->div(value);
     }
     template <typename Y>
-    Tensor<Y> div(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> div(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.div(t2);
     }
     template <typename Y>
-    Tensor<Y> div(const Tensor<Y> &t1, Y value)
+    Tensor<Y> div(const Tensor<Y> &t1, Y value) const
     {
         return t1.div(value);
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::log(const Tensor<T> &t)
+    Tensor<T> Tensor<T>::log(const Tensor<T> &t) const
     {
         checkShape(*this, t);
         Tensor<T> t1 = this->contiguous();
@@ -576,7 +576,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::log(T value)
+    Tensor<T> Tensor<T>::log(T value) const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -587,7 +587,7 @@ namespace ts
         return result;
     }
     template <typename T>
-    Tensor<T> Tensor<T>::log()
+    Tensor<T> Tensor<T>::log() const
     {
         Tensor<T> t1 = this->contiguous();
         Tensor<T> result = Tensor(this->shape);
@@ -598,12 +598,12 @@ namespace ts
         return result;
     }
     template <typename Y>
-    Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2)
+    Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2) const
     {
         return t1.log(t2);
     }
     template <typename Y>
-    Tensor<Y> log(const Tensor<Y> &t1, Y value)
+    Tensor<Y> log(const Tensor<Y> &t1, Y value) const
     {
         return t1.log(value);
     }

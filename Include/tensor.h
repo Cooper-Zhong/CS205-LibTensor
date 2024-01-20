@@ -116,21 +116,21 @@ namespace ts
         /**
          * @brief 重载运算符
          */
-        Tensor<T>& deepcopy_from(const Tensor<T> &t);    // deepcopy
-        Tensor<bool> operator==(const Tensor<T> &t); // 等于
-        Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
-        Tensor<bool> operator>(const Tensor<T> &t);  // 大于
-        Tensor<bool> operator<(const Tensor<T> &t);  // 小于
-        Tensor<bool> operator>=(const Tensor<T> &t); // 大于等于
-        Tensor<bool> operator<=(const Tensor<T> &t); // 小于等于
-        Tensor<bool> eq(const Tensor<T> &t);         // 等于
-        Tensor<bool> ne(const Tensor<T> &t);         // 不等于
-        Tensor<bool> gt(const Tensor<T> &t);         // 大于
-        Tensor<bool> lt(const Tensor<T> &t);         // 小于
-        Tensor<bool> ge(const Tensor<T> &t);         // 大于等于
-        Tensor<bool> le(const Tensor<T> &t);         // 小于等于
+        Tensor<T>& deepcopy_from(const Tensor<T> &t) const;    // deepcopy
+        Tensor<bool> operator==(const Tensor<T> &t) const; // 等于
+        Tensor<bool> operator!=(const Tensor<T> &t) const; // 不等于
+        Tensor<bool> operator>(const Tensor<T> &t) const;  // 大于
+        Tensor<bool> operator<(const Tensor<T> &t) const;  // 小于
+        Tensor<bool> operator>=(const Tensor<T> &t) const; // 大于等于
+        Tensor<bool> operator<=(const Tensor<T> &t) const; // 小于等于
+        Tensor<bool> eq(const Tensor<T> &t) const;         // 等于
+        Tensor<bool> ne(const Tensor<T> &t) const;         // 不等于
+        Tensor<bool> gt(const Tensor<T> &t) const;         // 大于
+        Tensor<bool> lt(const Tensor<T> &t) const;         // 小于
+        Tensor<bool> ge(const Tensor<T> &t) const;         // 大于等于
+        Tensor<bool> le(const Tensor<T> &t) const;         // 小于等于
 
-        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
+        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2) const; // 检查两个张量的dataType, dim, shape是否相同
 
         template <typename U>
         friend Tensor<T> einsum(const std::string &equation, const std::vector<Tensor<T>> &tensors); // einsum

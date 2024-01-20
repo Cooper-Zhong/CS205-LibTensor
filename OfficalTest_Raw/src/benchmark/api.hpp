@@ -13,6 +13,8 @@ namespace ts {
 #pragma ide diagnostic ignored "readability-redundant-declaration"
 
 namespace bm {
+    std::vector<int> int_shape(const std::vector<size_t> &shape);
+    std::vector<std::vector<int>> int_slices(const std::vector<std::pair<size_t, size_t>> &slices);
 
     /**
      * @brief Creates a tensor from a given array by copying data to its own memory (the tensor has no ownership of {@code data}).
@@ -20,7 +22,7 @@ namespace bm {
      * @param data flatten data of the tensor (row major)
      * @note Please delegate a proper implemented {@code ts::Tensor} constructor to create a tensor
      */
-    template<typename T>
+    template <typename T>
     ts::Tensor<T> create_with_data(const std::vector<size_t> &shape, const T *data);
 
     template<typename T>
