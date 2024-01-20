@@ -253,6 +253,7 @@ namespace ts
         Tensor<T> cu_mul(Tensor<T>& t);
         Tensor<T> cu_div(Tensor<T>& t);
         Tensor<T> cu_ein(Tensor<T>& t);
+        Tensor<T> cu_log();
 
         Tensor<bool> cu_eq(Tensor<T>& t);
         Tensor<bool> cu_ne(Tensor<T>& t);

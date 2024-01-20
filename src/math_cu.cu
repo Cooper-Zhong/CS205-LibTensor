@@ -40,22 +40,16 @@ namespace ts
     }
 
     template<typename T>
-    __global__ void ein_cu_kernal(T* result, const T* data1, const T* data2, int t1_height, int t1_width, int t2_width) {
+    __global__ void log_cu_kernal(T* result, const T* data1, int length){
         size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= t1_height*t2_width)
+        if (idx < length)
         {
-            return;
+            result[idx] = std::log(data1[idx]);
         }
-        size_t row = idx/t2_width;
-        size_t col = idx%t2_width;
-
-        T ans = 0;
-        for (size_t i = 0; i < t1_width; i++)
-        {
-            ans+=data1[row*t1_width + i] * data2[i*t2_width+col];
-        }
-        result[row*t2_width + col] = ans;
     }
+
+
+
 
     template<typename T>
     Tensor<T> Tensor<T>::cu_add(Tensor<T>& t){
@@ -156,6 +150,52 @@ namespace ts
         return result;
     }
     template ts::Tensor<double> ts::Tensor<double>::cu_div(ts::Tensor<double>&);
+
+    template<typename T>
+    Tensor<T> Tensor<T>::cu_log(){
+        Tensor<T> result = Tensor<T>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        log_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.gpu_t ,gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<double> ts::Tensor<double>::cu_log();
+
+
+
+
+
+
+    template<typename T>
+    __global__ void ein_cu_kernal(T* result, const T* data1, const T* data2, int t1_height, int t1_width, int t2_width) {
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= t1_height*t2_width)
+        {
+            return;
+        }
+        size_t row = idx/t2_width;
+        size_t col = idx%t2_width;
+
+        T ans = 0;
+        for (size_t i = 0; i < t1_width; i++)
+        {
+            ans+=data1[row*t1_width + i] * data2[i*t2_width+col];
+        }
+        result[row*t2_width + col] = ans;
+    }
 
     template<typename T>
     Tensor<T> Tensor<T>::cu_ein(Tensor<T>& t){
