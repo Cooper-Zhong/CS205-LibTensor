@@ -22,8 +22,8 @@ namespace xtada {
         return bm::create_with_data(shape, xarray.data());
     }
 
-    template<typename T>
-    bool equals(const T &a, const T &b) {
+    template<typename T, typename V>
+    bool equals(const T &a, const V &b) {
         return a == b;
     }
 

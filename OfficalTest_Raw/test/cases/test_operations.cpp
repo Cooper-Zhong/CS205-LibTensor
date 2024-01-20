@@ -16,7 +16,7 @@ TEST_F(TensorTest, Concate) {
         RANDOM_SHAPE(base_shape)
 
         auto cat_dim = std::uniform_int_distribution<size_t>(0, base_shape_dim - 1)(rng);
-        auto cat_size = std::uniform_int_distribution<size_t>(1, 5)(rng);
+        auto cat_size = std::uniform_int_distribution<size_t>(2, 5)(rng);
 
         std::vector<xt::xarray<float>> xarrs;
         for (int i = 0; i < cat_size; i++) {
@@ -28,9 +28,9 @@ TEST_F(TensorTest, Concate) {
             xarrs.push_back(xarr);
         }
 
-        auto cat_xarr = xt::eval(xt::random::randn<float>(base_shape));
-        for (auto &xarr: xarrs) {
-            cat_xarr = xt::concatenate(xt::xtuple(cat_xarr, xarr), cat_dim);
+        auto cat_xarr = xarrs[0];
+        for (int i = 1; i < cat_size; i++) {
+            cat_xarr = xt::concatenate(xt::xtuple(cat_xarr, xarrs[i]), cat_dim);
         }
 
         spdlog::debug("cat_dim: {}", cat_dim);

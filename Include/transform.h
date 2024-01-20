@@ -120,7 +120,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::permute(const std::vector<int> &axes)
+    Tensor<T> Tensor<T>::permute(const std::vector<int> &axes) const
     {
         // Check if the number of axes is equal to the number of dimensions
         if (axes.size() != ndim)
@@ -170,7 +170,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::transpose(const int &dim1, const int &dim2)
+    Tensor<T> Tensor<T>::transpose(const int &dim1, const int &dim2) const
     {
         // Check if the number of axes is equal to the number of dimensions
         if (dim1 < 0 || dim1 >= ndim || dim2 < 0 || dim2 >= ndim)
@@ -199,7 +199,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int &dim)
+    Tensor<T> Tensor<T>::cat(const Tensor<T> &other, const int &dim) const
     {
         // Check if the number of dimensions is equal
         if (ndim != other.ndim)
@@ -245,8 +245,8 @@ namespace ts
             }
         }
 
-        new_tensor(slicing_indices_current) = *this;
-        new_tensor(slicing_indices_other) = other;
+        new_tensor(slicing_indices_current).deepcopy_from( *this);
+        new_tensor(slicing_indices_other).deepcopy_from(other);
 
         return new_tensor;
     }
@@ -296,7 +296,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape)
+    Tensor<T> Tensor<T>::reshape(const std::vector<int> &shape) const
     {
         // check contiguous of the tensor
         if (!is_contiguous())
@@ -325,12 +325,12 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::squeeze() const
+    Tensor<T> Tensor<T>::squeeze()
     {
         // Check if the tensor is a vector
         if (ndim == 1)
         {
-            throw std::invalid_argument("The tensor is already a vector.");
+            return *this;
         }
 
         // Calculate the new shape
@@ -365,7 +365,58 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::unsqueeze(int new_dim)
+    Tensor<T> Tensor<T>::squeeze(int dim){
+        // Check if the dimension is valid
+        if (dim < 0 || dim >= ndim)
+        {
+            throw std::invalid_argument("The dimension is out of range.");
+        }
+
+        // Check if the tensor is a vector
+        if (ndim == 1)
+        {
+            return *this;
+        }
+
+        // Check if the dimension is valid
+        if (shape[dim] != 1)
+        {
+            throw std::invalid_argument("The dimension is not 1.");
+        }
+
+        // Calculate the new shape
+        std::vector<int> new_shape;
+        for (int i = 0; i < ndim; i++)
+        {
+            if (i != dim)
+            {
+                new_shape.push_back(shape[i]);
+            }
+        }
+
+        // Create a new tensor
+        Tensor<T> new_tensor;
+        new_tensor.data = data;
+        new_tensor.offset = offset;
+        new_tensor.ndim = new_shape.size();
+        new_tensor.data_length = data_length;
+        new_tensor.shape = new_shape;
+
+        // Calculate the new stride
+        std::vector<int> new_stride;
+        int data_l = data_length;
+        for (int i = 0; i < new_tensor.ndim; i++)
+        {
+            data_l /= new_shape[i];
+            new_stride.push_back(data_l);
+        }
+        new_tensor.stride = new_stride;
+
+        return new_tensor;
+    }
+
+    template <typename T>
+    Tensor<T> Tensor<T>::unsqueeze(int new_dim) const
     {
         // Check if the dimension is valid
         if (new_dim < 0 || new_dim < ndim)
@@ -419,7 +470,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::tile(std::vector<int> dims)
+    Tensor<T> Tensor<T>::tile(std::vector<int> dims) const
     {
         // Check if the dimensions are valid
         for (int i = 0; i < ndim; i++)
@@ -494,9 +545,13 @@ namespace ts
         return reshaped_tensor;
     }
 
-    
     template <typename T>
     T& Tensor<T>::at(const std::vector<int> &indices) const{
+        // Check if the tensor is a vector
+        if(ndim == 1 && data_length == 1 && (indices.size() == 0 || indices.size() == 1)){
+            return data[offset];
+        }
+
         // Check if the number of indices is equal to the number of dimensions
         if (indices.size() != ndim)
         {

@@ -90,23 +90,24 @@ namespace ts
 
         T &enisum_indexing(const std::vector<int> &indices) const;
 
-        Tensor<T> permute(const std::vector<int> &axes);
+        Tensor<T> permute(const std::vector<int> &axes) const;
 
-        Tensor<T> transpose(const int &dim1, const int &dim2);
+        Tensor<T> transpose(const int &dim1, const int &dim2) const;
 
-        Tensor<T> cat(const Tensor<T> &other, const int &dim);
+        Tensor<T> cat(const Tensor<T> &other, const int &dim) const;
 
         bool is_contiguous() const;
 
         Tensor<T> contiguous() const;
 
-        Tensor<T> reshape(const std::vector<int> &shape);
+        Tensor<T> reshape(const std::vector<int> &shape) const;
 
-        Tensor<T> squeeze() const;
+        Tensor<T> squeeze();
+        Tensor<T> squeeze(int dim);
 
-        Tensor<T> unsqueeze(int new_dim);
+        Tensor<T> unsqueeze(int new_dim) const;
 
-        Tensor<T> tile(std::vector<int> dims);
+        Tensor<T> tile(std::vector<int> dims) const;
 
         Tensor<T> view(const std::vector<int> &shape) const;
 
@@ -116,7 +117,7 @@ namespace ts
         /**
          * @brief 重载运算符
          */
-        Tensor<T>& deepcopy_from(const Tensor<T> &t) const;    // deepcopy
+        Tensor<T>& deepcopy_from(const Tensor<T> &t);    // deepcopy
         Tensor<bool> operator==(const Tensor<T> &t) const; // 等于
         Tensor<bool> operator!=(const Tensor<T> &t) const; // 不等于
         Tensor<bool> operator>(const Tensor<T> &t) const;  // 大于
@@ -130,7 +131,7 @@ namespace ts
         Tensor<bool> ge(const Tensor<T> &t) const;         // 大于等于
         Tensor<bool> le(const Tensor<T> &t) const;         // 小于等于
 
-        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2) const; // 检查两个张量的dataType, dim, shape是否相同
+        static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
 
         template <typename U>
         friend Tensor<T> einsum(const std::string &equation, const std::vector<Tensor<T>> &tensors); // einsum
@@ -157,7 +158,7 @@ namespace ts
         template <typename U>
         friend Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2); // 小于
         template <typename U>
-        friend Tensor<U> sum(const Tensor<U> &t, const int &dim);
+        friend Tensor<U> sum(const Tensor<U> &t, const int &dim) ;
 
         template <typename U>
         friend Tensor<U> mean(const Tensor<U> &t, const int &dim);
@@ -170,10 +171,10 @@ namespace ts
 
         static Tensor<T> re_construct(const Tensor<T> &t);
 
-        Tensor<T> add(const Tensor<T> &t);
-        Tensor<T> add(T value);
-        Tensor<T> operator+(const Tensor<T> &t);
-        Tensor<T> operator+(T value);
+        Tensor<T> add(const Tensor<T> &t) const;
+        Tensor<T> add(T value) const;
+        Tensor<T> operator+(const Tensor<T> &t) const;
+        Tensor<T> operator+(T value) const;
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
@@ -182,37 +183,37 @@ namespace ts
         friend Tensor<Y> add_cu_f(const Tensor<Y> &t1, const Tensor<Y> &t2);
         Tensor<T> add_cu(const Tensor<T> &t1);
 
-        Tensor<T> sub(const Tensor<T> &t);
-        Tensor<T> sub(T value);
-        Tensor<T> operator-(const Tensor<T> &t);
-        Tensor<T> operator-(T value);
+        Tensor<T> sub(const Tensor<T> &t) const;
+        Tensor<T> sub(T value) const;
+        Tensor<T> operator-(const Tensor<T> &t) const;
+        Tensor<T> operator-(T value) const;
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> mul(const Tensor<T> &t);
-        Tensor<T> mul(T value);
-        Tensor<T> operator*(const Tensor<T> &t);
-        Tensor<T> operator*(T value);
+        Tensor<T> mul(const Tensor<T> &t) const;
+        Tensor<T> mul(T value) const;
+        Tensor<T> operator*(const Tensor<T> &t) const;
+        Tensor<T> operator*(T value) const;
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> div(const Tensor<T> &t);
-        Tensor<T> div(T value);
+        Tensor<T> div(const Tensor<T> &t) const; 
+        Tensor<T> div(T value) const;
 
-        Tensor<T> operator/(const Tensor<T> &t);
-        Tensor<T> operator/(T value);
+        Tensor<T> operator/(const Tensor<T> &t) const;
+        Tensor<T> operator/(T value) const;
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> log(const Tensor<T> &t);
-        Tensor<T> log(T value);
-        Tensor<T> log();
+        Tensor<T> log(const Tensor<T> &t) const;
+        Tensor<T> log(T value) const;
+        Tensor<T> log() const;
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>

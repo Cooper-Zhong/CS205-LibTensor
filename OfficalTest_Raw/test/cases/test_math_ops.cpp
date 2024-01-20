@@ -17,7 +17,6 @@ TEST_F(TensorTest, Reduction) {
 
         auto xarr = xt::eval(xt::random::randn<float>(shape));
         auto tensor = xtada::to_tensor(xarr);
-
         EXPECT_EQUIV(xt::sum(xarr, axis), bm::reduce_sum(tensor, axis));
         EXPECT_EQUIV((xt::xarray<float>) xt::mean(xarr, axis), bm::reduce_mean(tensor, axis));
         EXPECT_EQUIV(xt::amax(xarr, axis), bm::reduce_max(tensor, axis));
