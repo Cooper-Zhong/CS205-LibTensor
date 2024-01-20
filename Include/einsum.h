@@ -32,9 +32,6 @@ namespace ts {
     */
     template<typename T>
     Tensor<T> einsum(const std::string &equation, const std::vector<Tensor<T>> &tensors) {
-        std::map<char, int> dims;                  // 每个维度的大小,dims['i'] 指i对应的维度大小
-        std::map<char, int> cur_index;             // 每个维度每一轮遍历的下标
-        std::vector<char> dim_iter_order;          // 遍历的维度顺序
         std::vector<std::vector<char>> input_dims; // 每个输入Tensor的维度对应的字母 "ijk,ikl->ij" -> {{'i','j','k'},{'i','k','l'}}
         std::vector<char> output_part;             // 输出Tensor对应的字母
         std::vector<char> input_part; // 临时存储输入Tensor的维度对应的字母
@@ -67,29 +64,32 @@ namespace ts {
             throw std::invalid_argument("The number of input tensors != the number of input parts in equation.");
         }
 
-        only1dim = output_part.size() == 0; // -> 后面没有字母，说明输出是标量
+        std::map<char, int> dims;                  // 每个维度的大小,dims['i'] 指i对应的维度大小
+        std::map<char, int> traverse_index;             // 每个维度每一轮遍历的下标
+        std::vector<char> dim_iter_order;          // 遍历的维度顺序
 
-        for (int i = 0; i < input_dims.size(); i++) { // "ijk,ikl->ij" => {{'i','j','k'},{'i','k','l'}}
+        for (int i = 0; i < tensors.size(); i++) { // "ijk,ikl->ij" => {{'i','j','k'},{'i','k','l'}}
             for (int j = 0; j < input_dims[i].size(); j++) {
                 char c = input_dims[i][j];
-                if (dims.find(c) == dims.end()) { // 如果dims中没有这个维度
-                    dim_iter_order.push_back(c);
-                    dims[c] = tensors[i].get_shape()[j]; // 将这个维度的大小加入dims, 例 维度'i'的大小为 dims[i]
-                    cur_index[c] = 0;                    // 下标初始化为0
-                } else {
+                if (dims.find(c) != dims.end()) { // 如果dims中有这个维度
                     if (dims[c] != tensors[i].get_shape()[j]) {
                         throw std::invalid_argument("The shape of input tensors is not valid.");
                     }
+                } else {
+                    dim_iter_order.push_back(c);
+                    dims[c] = tensors[i].get_shape()[j]; // 将这个维度的大小加入dims, 例 维度'i'的大小为 dims[i]
+                    traverse_index[c] = 0;                    // 下标初始化为0
                 }
             }
         }
         std::vector<int> result_shape;
-        if (only1dim) { // 标量
-            result_shape.push_back(1);
-        } else {
+        only1dim = output_part.size() == 0; // -> 后面没有字母，说明输出是标量
+        if (!only1dim) { // not scalar
             for (char c: output_part) {
                 result_shape.push_back(dims[c]);
             }
+        } else {
+            result_shape.push_back(1);
         }
         Tensor<T> result(result_shape);
 
@@ -100,7 +100,7 @@ namespace ts {
             for (int i = 0; i < tensors.size(); i++) {
                 indices.clear();
                 for (char dim: input_dims[i]) {
-                    indices.push_back(cur_index[dim]); // 某个维度当前遍历到的索引
+                    indices.push_back(traverse_index[dim]); // 某个维度当前遍历到的索引
                 }
                 term *= tensors[i].enisum_indexing(indices); // 使用indices获取两个/多个tensor的值
             }
@@ -110,7 +110,7 @@ namespace ts {
             } else {
                 indices.clear();
                 for (char dim: output_part) {
-                    indices.push_back(cur_index[dim]);
+                    indices.push_back(traverse_index[dim]);
                 }
                 result.enisum_indexing(indices) += term;//累加
             }
@@ -118,11 +118,11 @@ namespace ts {
             // 更新下标
             for (int i = dim_iter_order.size() - 1; i >= 0; i--) {
                 int id = dim_iter_order[i];
-                if (cur_index[id] < dims[id] - 1) {// 当前维度的下标还没有到达这个维度的最大值
-                    cur_index[id]++;
+                if (traverse_index[id] < dims[id] - 1) {// 当前维度的下标还没有到达这个维度的最大值
+                    traverse_index[id]++;
                     break;
                 } else {
-                    cur_index[id] = 0; // 将当前索引重置为0, 继续更新前一个维度的索引
+                    traverse_index[id] = 0; // 将当前索引重置为0, 继续更新前一个维度的索引
                     if (i == 0) { // 如果当前索引已经到达了最后一个维度的最大值
                         return result;
                     }

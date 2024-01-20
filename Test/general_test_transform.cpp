@@ -27,10 +27,37 @@ void general_test_transform(){
     cout << "t1 data pointer: " << t1.get_data() << endl;
 
     cout << "--------------- Mutating Test ---------------" << endl;
-    // t1[]
-    cout << "t1[1:3,2:4]:\n" << test << endl;
-    cout << "t1[1:3,2:4] data pointer: " << test.get_data() << endl;
+    cout << "t1 before mutating: " << endl << t1;
+    t1[{1,2}]=77;
+    cout << "t1[{1,2}]=77" << endl;
+    cout << "t1 after mutating: " << endl << t1;
+
+
+    t1[{1,2}]=7;
+
+    cout << "--------------- Transpose Test ---------------" << endl;
+    cout << "t1 before transposing " << endl << t1;
     cout << "t1 data pointer: " << t1.get_data() << endl;
+    test = t1.transpose(0,1);
+    cout << "t1 after transposing " << endl << test;
+    cout << "t1 data pointer: " << test.get_data() << endl;
+
+    cout << "--------------- Permute Test ---------------" << endl;
+    cout << "t1 before permuting " << endl << t1;
+    cout << "t1 data pointer: " << t1.get_data() << endl;
+    test = t1.permute({1,0});
+    cout << "t1 after permuting " << endl << test;
+    cout << "t1 data pointer: " << test.get_data() << endl;
+
+    cout << "--------------- View Test ---------------" << endl;
+    cout << "t1 before permuting " << endl << t1;
+    cout << "t1 data pointer: " << t1.get_data() << endl;
+    test = t1.view({2,5,2});
+    cout << "t1 after permuting " << endl << test;
+    cout << "t1 data pointer: " << test.get_data() << endl;
+
+
+
 
 
 }
