@@ -11,7 +11,7 @@ namespace ts {
         int total_size = (end - start) / step;
         Tensor<T> res = Tensor<T>({total_size});
         for (int i = 0; i < total_size; i++) {
-            res.data[i] = start + i * step;
+            res.get_data()[i] = start + i * step;
         }
         return res;
     }
