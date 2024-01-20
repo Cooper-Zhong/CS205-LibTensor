@@ -28,10 +28,11 @@ void general_test_transform(){
 
     cout << "--------------- Mutating Test ---------------" << endl;
     cout << "t1 before mutating: " << endl << t1;
+    cout << "t1 data pointer: " << t1.get_data() << endl;
     t1[{1,2}]=77;
     cout << "t1[{1,2}]=77" << endl;
     cout << "t1 after mutating: " << endl << t1;
-
+    cout << "t1 data pointer: " << t1.get_data() << endl;
 
     t1[{1,2}]=7;
 
@@ -50,10 +51,10 @@ void general_test_transform(){
     cout << "t1 data pointer: " << test.get_data() << endl;
 
     cout << "--------------- View Test ---------------" << endl;
-    cout << "t1 before permuting " << endl << t1;
+    cout << "t1 before viewing " << endl << t1;
     cout << "t1 data pointer: " << t1.get_data() << endl;
     test = t1.view({2,5,2});
-    cout << "t1 after permuting " << endl << test;
+    cout << "t1 after viewing " << endl << test;
     cout << "t1 data pointer: " << test.get_data() << endl;
 
 
