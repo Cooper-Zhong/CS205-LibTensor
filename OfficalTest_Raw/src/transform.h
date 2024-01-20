@@ -245,8 +245,8 @@ namespace ts
             }
         }
 
-        new_tensor(slicing_indices_current) = *this;
-        new_tensor(slicing_indices_other) = other;
+        new_tensor(slicing_indices_current).deepcopy_from( *this);
+        new_tensor(slicing_indices_other).deepcopy_from(other);
 
         return new_tensor;
     }

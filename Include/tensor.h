@@ -102,7 +102,8 @@ namespace ts
 
         Tensor<T> reshape(const std::vector<int> &shape) const;
 
-        Tensor<T> squeeze() const;
+        Tensor<T> squeeze();
+        Tensor<T> squeeze(int dim);
 
         Tensor<T> unsqueeze(int new_dim) const;
 
@@ -178,7 +179,6 @@ namespace ts
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
-
 
         Tensor<T> sub(const Tensor<T> &t) const;
         Tensor<T> sub(T value) const;
