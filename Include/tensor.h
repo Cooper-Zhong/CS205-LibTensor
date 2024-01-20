@@ -315,7 +315,7 @@ namespace ts
         std::mt19937 gen(rd());
 
         // std::uniform_real_distribution<T> dis(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        std::uniform_real_distribution<T> dis(-10, 10);
+        std::uniform_real_distribution<> dis(-10, 10);
         for (int i = 0; i < random_tensor.data_length; i++)
         {
             random_tensor.data[i] = dis(gen);

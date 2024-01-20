@@ -11,7 +11,7 @@ void test_rand()
 {
     // test permutate
     vector<int> shape = {2, 2, 2};
-    ts::Tensor<float> t = ts::Tensor<float>::rand_tensor(shape);
+    ts::Tensor<double> t = ts::Tensor<double>::rand_tensor(shape);
     cout << t << endl;
 }
 
