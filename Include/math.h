@@ -247,7 +247,7 @@ namespace ts
         Tensor result = Tensor<T>(result_shape);
         for (int i = 0; i < result.data_length; ++i)
         {
-            result.data[i] = std::numeric_limits<T>::min();
+            result.data[i] = -std::numeric_limits<T>::infinity();
         }
         std::vector<int> index = std::vector<int>(this->ndim, 0);
         int top = this->ndim - 1;
@@ -308,7 +308,7 @@ namespace ts
         Tensor result = Tensor<T>(result_shape);
         for (int i = 0; i < result.data_length; ++i)
         {
-            result.data[i] = std::numeric_limits<T>::max();
+            result.data[i] = std::numeric_limits<T>::infinity();
         }
         std::vector<int> index = std::vector<int>(this->ndim, 0);
         int top = this->ndim - 1;
