@@ -232,16 +232,13 @@ namespace ts
         Tensor<T> omp_div(T value);
         Tensor<T> omp_log(const Tensor<T> &t);
         Tensor<T> omp_log(T value);
-        Tensor<T> omp_sum(const int &dim);
-        Tensor<T> omp_mean(const int &dim);
-        Tensor<T> omp_max(const int &dim);
-        Tensor<T> omp_min(const int &dim);
-        Tensor<T> omp_eq(const Tensor<T> &t);
-        Tensor<T> omp_ne(const Tensor<T> &t);
-        Tensor<T> omp_gt(const Tensor<T> &t);
-        Tensor<T> omp_ge(const Tensor<T> &t);
-        Tensor<T> omp_lt(const Tensor<T> &t);
-        Tensor<T> omp_le(const Tensor<T> &t);
+        Tensor<T> omp_log();
+        Tensor<bool> omp_eq(const Tensor<T> &t);
+        Tensor<bool> omp_ne(const Tensor<T> &t);
+        Tensor<bool> omp_gt(const Tensor<T> &t);
+        Tensor<bool> omp_ge(const Tensor<T> &t);
+        Tensor<bool> omp_lt(const Tensor<T> &t);
+        Tensor<bool> omp_le(const Tensor<T> &t);
 
         // cuda related functions
         void cpu(); // load data from gpu to cpu
