@@ -46,6 +46,8 @@ namespace xtada {
                              fmt::join(index, ", "),
                              expected[index],
                              bm::at(actual, index));
+                std::cout << expected << std::endl;
+                std::cout << actual << std::endl;
                 return false;
             }
         }
