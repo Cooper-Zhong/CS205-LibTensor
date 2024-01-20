@@ -39,8 +39,6 @@ namespace ts
         }
     }
 
-
-
     template<typename T>
     __global__ void ein_cu_kernal(T* result, const T* data1, const T* data2, int t1_height, int t1_width, int t2_width) {
         size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -187,6 +185,232 @@ namespace ts
 
 
 
+
+
+
+
+
+
+
+    template<typename T>
+    __global__ void eq_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] == data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_eq(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        eq_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_eq(ts::Tensor<double>&);
+
+
+    template<typename T>
+    __global__ void ne_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] != data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_ne(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        ne_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_ne(ts::Tensor<double>&);
+
+    template<typename T>
+    __global__ void gt_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] > data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_gt(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        gt_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_gt(ts::Tensor<double>&);
+
+    template<typename T>
+    __global__ void ge_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] >= data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_ge(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        ge_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_ge(ts::Tensor<double>&);
+
+    template<typename T>
+    __global__ void lt_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] < data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_lt(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        lt_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_lt(ts::Tensor<double>&);
+
+    template<typename T>
+    __global__ void le_cu_kernal(bool* result, const T* data1, const T* data2, int length){
+        size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < length)
+        {
+            result[idx] = (data1[idx] <= data2[idx]);
+        }
+    }
+
+    template<typename T>
+    Tensor<bool> Tensor<T>::cu_le(Tensor<T>& t){
+        Tensor<bool> result = Tensor<bool>(shape);
+
+        if(gpu_t == nullptr){
+            gpu();
+        }
+        if(t.gpu_t == nullptr){
+            t.gpu();
+        }
+
+        int threadsPerBlock = 1024;
+        int numBlocks = (data_length + threadsPerBlock-1) / threadsPerBlock;
+
+        result.gpu();
+
+        le_cu_kernal<<<numBlocks,threadsPerBlock>>>(result.get_gpu_t() ,gpu_t,t.gpu_t,data_length);
+
+        result.cpu();
+        result.gpu_free();
+
+        return result;
+    }
+    template ts::Tensor<bool> ts::Tensor<double>::cu_le(ts::Tensor<double>&);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     template<typename T>
     void Tensor<T>::gpu(){
         if(gpu_t != nullptr){
@@ -197,6 +421,7 @@ namespace ts
         cudaMemcpy(gpu_t, data.get(), data_length*sizeof(T), cudaMemcpyHostToDevice);
     }
     template void Tensor<double>::gpu();
+    template void Tensor<bool>::gpu();
 
 
     template<typename T>
@@ -204,6 +429,8 @@ namespace ts
         cudaMemcpy(data.get(), gpu_t, data_length*sizeof(T),cudaMemcpyDeviceToHost);
     }
     template void Tensor<double>::cpu();
+    template void Tensor<bool>::cpu();
+
 
 
     template<typename T>
@@ -214,6 +441,8 @@ namespace ts
         }
     }
     template void Tensor<double>::gpu_free();
+    template void Tensor<bool>::gpu_free();
+
 
 
     template<typename T>
@@ -221,6 +450,8 @@ namespace ts
         return gpu_t;
     }
     template double* Tensor<double>::get_gpu_t();
+    template bool* Tensor<bool>::get_gpu_t();
+
 
     
 }
