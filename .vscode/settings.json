@@ -74,6 +74,8 @@
         "iterator": "cpp",
         "memory_resource": "cpp",
         "utility": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "*.tpp": "cpp",
+        "fstream": "cpp"
     }
 }

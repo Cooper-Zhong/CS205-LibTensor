@@ -488,10 +488,46 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::view(const std::vector<int> &shape)
+    Tensor<T> Tensor<T>::view(const std::vector<int> &shape) const
     {
         Tensor<T> reshaped_tensor = reshape(shape);
         return reshaped_tensor;
+    }
+
+    
+    template <typename T>
+    T& Tensor<T>::at(const std::vector<int> &indices) const{
+        // Check if the number of indices is equal to the number of dimensions
+        if (indices.size() != ndim)
+        {
+            throw std::invalid_argument("The number of indices must be equal to the number of dimensions.");
+        }
+
+        // Check if the indices are valid
+        for (int i = 0; i < ndim; i++)
+        {
+            if (indices[i] < -1 || indices[i] >= shape[i]) // -1 means all elements
+            {
+                throw std::invalid_argument("The indices are out of range.");
+            }
+        }
+
+        // Calculate the offset
+        int offset = 0;
+        for (int i = 0; i < ndim; i++)
+        {
+            if (indices[i] != -1)
+            {
+                offset += indices[i] * stride[i];
+            }
+        }
+
+        return data[offset];
+    }
+
+    template <typename T>
+    T& Tensor<T>::operator[](const std::vector<int> &indices) const{
+        return at(indices);
     }
 
 } // namespace ts

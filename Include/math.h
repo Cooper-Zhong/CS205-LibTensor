@@ -586,6 +586,17 @@ namespace ts
         }
         return result;
     }
+    template <typename T>
+    Tensor<T> Tensor<T>::log()
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = std::log(t1.data[i]);
+        }
+        return result;
+    }
     template <typename Y>
     Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2)
     {

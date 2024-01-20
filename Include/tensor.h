@@ -77,6 +77,11 @@ namespace ts
         // use -1 to indicate all elements
         Tensor<T> indexing(const std::vector<int> &indices) const;
 
+        T& at(const std::vector<int> &indices) const;
+
+        // alias for at
+        T& operator[](const std::vector<int> &indices) const;
+
         // alias for slicing
         Tensor<T> operator()(const std::vector<std::vector<int>> &indices) const;
 
@@ -103,7 +108,7 @@ namespace ts
 
         Tensor<T> tile(std::vector<int> dims);
 
-        Tensor<T> view(const std::vector<int> &shape);
+        Tensor<T> view(const std::vector<int> &shape) const;
 
         template <typename T1>
         friend std::ostream &operator<<(std::ostream &o, const Tensor<T1> &t);
@@ -207,6 +212,7 @@ namespace ts
 
         Tensor<T> log(const Tensor<T> &t);
         Tensor<T> log(T value);
+        Tensor<T> log();
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
