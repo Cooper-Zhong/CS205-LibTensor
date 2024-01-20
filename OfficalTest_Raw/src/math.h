@@ -210,7 +210,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze();
+        return result.squeeze(dim);
     }
 
     template <typename T>
@@ -281,7 +281,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze();
+        return result.squeeze(dim);
     }
 
 
@@ -345,7 +345,7 @@ namespace ts
                 index[top] = 0;
             }
         }
-        return result.squeeze();
+        return result.squeeze(dim);
     }
 
     template <typename U>
