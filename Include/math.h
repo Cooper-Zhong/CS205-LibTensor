@@ -759,8 +759,22 @@ namespace ts
         return result;
     }
 
+        template <typename T>
+    Tensor<T> Tensor<T>::omp_log()
+    {
+        Tensor<T> t1 = this->contiguous();
+        Tensor<T> result = Tensor(this->shape);
+
+        # pragma omp parallel for
+        for (int i = 0; i < result.data_length; i++)
+        {
+            result.data[i] = std::log(t1.data[i]);
+        }
+        return result;
+    }
+
     template <typename T>
-    Tensor<T> Tensor<T>::omp_eq(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_eq(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();
@@ -776,7 +790,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::omp_ne(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_ne(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();
@@ -792,7 +806,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::omp_gt(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_gt(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();
@@ -808,7 +822,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::omp_ge(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_ge(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();
@@ -824,7 +838,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::omp_lt(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_lt(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();
@@ -840,7 +854,7 @@ namespace ts
     }
 
     template <typename T>
-    Tensor<T> Tensor<T>::omp_le(const Tensor<T> &t){
+    Tensor<bool> Tensor<T>::omp_le(const Tensor<T> &t){
         checkShape(*this, t);
         Tensor<T> temp1 = contiguous();
         Tensor<T> temp2 = t.contiguous();

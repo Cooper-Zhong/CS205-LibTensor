@@ -58,7 +58,7 @@ if(CUDA_FOUND)
         get_filename_component(BENCHMARK_NAME ${BENCHMARK_FILE} NAME_WE)
         add_executable(${BENCHMARK_NAME} ${BENCHMARK_FILE} ${SRC_FILES} ${CUDA_FILES})  # 添加 CUDA 文件
         target_link_libraries(${BENCHMARK_NAME} benchmark::benchmark OpenMP::OpenMP_CXX)
-        target_compile_options(${BENCHMARK_NAME} PRIVATE -O3 -lpthread)
+        target_compile_options(${BENCHMARK_NAME} PRIVATE -lpthread)
         target_link_libraries(${BENCHMARK_NAME} ${CUDA_LIBRARIES})
     endforeach()
 endif()
