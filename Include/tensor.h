@@ -31,6 +31,7 @@ namespace ts
         int data_length;
         std::vector<int> shape;
         std::vector<int> stride;
+        T* gpu_t = nullptr;
 
     public:
         // Constructor
@@ -227,6 +228,14 @@ namespace ts
         Tensor<T> omp_div(T value);
         Tensor<T> omp_log(const Tensor<T> &t);
         Tensor<T> omp_log(T value);
+
+        // cuda related functions
+        void cpu(); // load data from gpu to cpu
+        void gpu(); // export data from cpu to gpu
+        void gpu_free();
+        T* get_gpu_t();
+        Tensor<T> cu_add(Tensor<T>& t);
+        Tensor<T> cu_ein(Tensor<T>& t);
         };
 
     // Default Constructor
@@ -618,6 +627,14 @@ namespace ts
 
         return *this;
     }
+    // template<typename T>
+    // void dataToDevice(T** dev, const T** hos, int length);
+
+    // template<typename T>
+    // void dataToHost(T** dev, T** hos, int length);
+
+    // template<typename T>
+    // void add_perf(T* result, const T* data1, const T* data2, int length);
 
 } // namespace ts
 
