@@ -178,9 +178,7 @@ namespace ts
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, Y value);
-        template <typename Y>
-        friend Tensor<Y> add_cu_f(const Tensor<Y> &t1, const Tensor<Y> &t2);
-        Tensor<T> add_cu(const Tensor<T> &t1);
+
 
         Tensor<T> sub(const Tensor<T> &t) const;
         Tensor<T> sub(T value) const;
@@ -241,7 +239,11 @@ namespace ts
         void gpu_free();
         T* get_gpu_t();
         Tensor<T> cu_add(Tensor<T>& t);
+        Tensor<T> cu_sub(Tensor<T>& t);
+        Tensor<T> cu_mul(Tensor<T>& t);
+        Tensor<T> cu_div(Tensor<T>& t);
         Tensor<T> cu_ein(Tensor<T>& t);
+
         };
 
     // Default Constructor
