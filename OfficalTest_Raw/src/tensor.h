@@ -117,18 +117,18 @@ namespace ts
          * @brief 重载运算符
          */
         Tensor<T>& deepcopy_from(const Tensor<T> &t);    // deepcopy
-        Tensor<bool> operator==(const Tensor<T> &t); // 等于
-        Tensor<bool> operator!=(const Tensor<T> &t); // 不等于
-        Tensor<bool> operator>(const Tensor<T> &t);  // 大于
-        Tensor<bool> operator<(const Tensor<T> &t);  // 小于
-        Tensor<bool> operator>=(const Tensor<T> &t); // 大于等于
-        Tensor<bool> operator<=(const Tensor<T> &t); // 小于等于
-        Tensor<bool> eq(const Tensor<T> &t);         // 等于
-        Tensor<bool> ne(const Tensor<T> &t);         // 不等于
-        Tensor<bool> gt(const Tensor<T> &t);         // 大于
-        Tensor<bool> lt(const Tensor<T> &t);         // 小于
-        Tensor<bool> ge(const Tensor<T> &t);         // 大于等于
-        Tensor<bool> le(const Tensor<T> &t);         // 小于等于
+        Tensor<bool> operator==(const Tensor<T> &t) const; // 等于
+        Tensor<bool> operator!=(const Tensor<T> &t) const; // 不等于
+        Tensor<bool> operator>(const Tensor<T> &t) const;  // 大于
+        Tensor<bool> operator<(const Tensor<T> &t) const;  // 小于
+        Tensor<bool> operator>=(const Tensor<T> &t) const; // 大于等于
+        Tensor<bool> operator<=(const Tensor<T> &t) const; // 小于等于
+        Tensor<bool> eq(const Tensor<T> &t) const;         // 等于
+        Tensor<bool> ne(const Tensor<T> &t) const;         // 不等于
+        Tensor<bool> gt(const Tensor<T> &t) const;         // 大于
+        Tensor<bool> lt(const Tensor<T> &t) const;         // 小于
+        Tensor<bool> ge(const Tensor<T> &t) const;         // 大于等于
+        Tensor<bool> le(const Tensor<T> &t) const;         // 小于等于
 
         static void checkShape(const Tensor<T> &t1, const Tensor<T> &t2); // 检查两个张量的dataType, dim, shape是否相同
 
@@ -157,7 +157,7 @@ namespace ts
         template <typename U>
         friend Tensor<bool> lt(const Tensor<T> &t1, const Tensor<T> &t2); // 小于
         template <typename U>
-        friend Tensor<U> sum(const Tensor<U> &t, const int &dim);
+        friend Tensor<U> sum(const Tensor<U> &t, const int &dim) ;
 
         template <typename U>
         friend Tensor<U> mean(const Tensor<U> &t, const int &dim);
@@ -170,10 +170,10 @@ namespace ts
 
         static Tensor<T> re_construct(const Tensor<T> &t);
 
-        Tensor<T> add(const Tensor<T> &t);
-        Tensor<T> add(T value);
-        Tensor<T> operator+(const Tensor<T> &t);
-        Tensor<T> operator+(T value);
+        Tensor<T> add(const Tensor<T> &t) const;
+        Tensor<T> add(T value) const;
+        Tensor<T> operator+(const Tensor<T> &t) const;
+        Tensor<T> operator+(T value) const;
         template <typename Y>
         friend Tensor<Y> add(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
@@ -182,37 +182,37 @@ namespace ts
         friend Tensor<Y> add_cu_f(const Tensor<Y> &t1, const Tensor<Y> &t2);
         Tensor<T> add_cu(const Tensor<T> &t1);
 
-        Tensor<T> sub(const Tensor<T> &t);
-        Tensor<T> sub(T value);
-        Tensor<T> operator-(const Tensor<T> &t);
-        Tensor<T> operator-(T value);
+        Tensor<T> sub(const Tensor<T> &t) const;
+        Tensor<T> sub(T value) const;
+        Tensor<T> operator-(const Tensor<T> &t) const;
+        Tensor<T> operator-(T value) const;
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> sub(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> mul(const Tensor<T> &t);
-        Tensor<T> mul(T value);
-        Tensor<T> operator*(const Tensor<T> &t);
-        Tensor<T> operator*(T value);
+        Tensor<T> mul(const Tensor<T> &t) const;
+        Tensor<T> mul(T value) const;
+        Tensor<T> operator*(const Tensor<T> &t) const;
+        Tensor<T> operator*(T value) const;
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> div(const Tensor<T> &t);
-        Tensor<T> div(T value);
+        Tensor<T> div(const Tensor<T> &t) const; 
+        Tensor<T> div(T value) const;
 
-        Tensor<T> operator/(const Tensor<T> &t);
-        Tensor<T> operator/(T value);
+        Tensor<T> operator/(const Tensor<T> &t) const;
+        Tensor<T> operator/(T value) const;
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
         friend Tensor<Y> mul(const Tensor<Y> &t1, Y value);
 
-        Tensor<T> log(const Tensor<T> &t);
-        Tensor<T> log(T value);
-        Tensor<T> log();
+        Tensor<T> log(const Tensor<T> &t) const;
+        Tensor<T> log(T value) const;
+        Tensor<T> log() const;
         template <typename Y>
         friend Tensor<Y> log(const Tensor<Y> &t1, const Tensor<Y> &t2);
         template <typename Y>
@@ -315,7 +315,7 @@ namespace ts
         std::mt19937 gen(rd());
 
         // std::uniform_real_distribution<T> dis(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        std::uniform_real_distribution<T> dis(-10, 10);
+        std::uniform_real_distribution<> dis(-10, 10);
         for (int i = 0; i < random_tensor.data_length; i++)
         {
             random_tensor.data[i] = dis(gen);
