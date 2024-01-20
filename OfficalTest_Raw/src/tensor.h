@@ -102,7 +102,8 @@ namespace ts
 
         Tensor<T> reshape(const std::vector<int> &shape) const;
 
-        Tensor<T> squeeze() const;
+        Tensor<T> squeeze();
+        Tensor<T> squeeze(int dim);
 
         Tensor<T> unsqueeze(int new_dim) const;
 
