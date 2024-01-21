@@ -75,5 +75,9 @@ int main()
     cout << ts::einsum<int>("ik,jkl,il->ij", {t1, t2, t3}) << endl;
     cout << "==============================" << endl;
 
+    cout << "Test 13: ijk->ikj" << endl;
+    t1 = ts::arange<int>(0, 24).reshape({2, 3, 4});
+    cout << ts::einsum<int>("ijk->ikj", {t1}) << endl;
+
     return 0;
 }
