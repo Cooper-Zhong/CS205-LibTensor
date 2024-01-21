@@ -68,3 +68,7 @@ if __name__ == '__main__':
     t3 = torch.arange(14).reshape(2, 7)
     print(torch.einsum('ik,jkl,il->ij', t1, t2, t3))
     print('======================')
+
+    print('Test 13: ijk->ikj')
+    t1 = torch.arange(24).reshape(2, 3, 4)
+    print(torch.einsum('ijk->ikj', t1))
