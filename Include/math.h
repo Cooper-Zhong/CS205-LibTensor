@@ -759,7 +759,7 @@ namespace ts
         return result;
     }
 
-        template <typename T>
+    template <typename T>
     Tensor<T> Tensor<T>::omp_log()
     {
         Tensor<T> t1 = this->contiguous();
