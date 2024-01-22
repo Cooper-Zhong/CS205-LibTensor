@@ -14,7 +14,8 @@ void general_test_acceleration(){
     ts::Tensor<double> t_val = ts::Tensor<double>(shape);
     ts::Tensor<bool> t_bool = ts::Tensor<bool>(shape);
     cout << "Beginning testing for acceleration in the sequence:\ndefault\nomp\ncuda" << endl;
-
+    cout << "t1: \n" << t1;
+    cout << "t2: \n" << t2;
     cout << "--------------- Addition Test ---------------" << endl;
     t_val = t1 + t2;
     cout << t_val;
